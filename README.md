@@ -11,6 +11,7 @@ npm run dev
 
 Open the printed local URL to explore the forest. Use `W`, `A`, `S`, `D` or the arrow keys to guide the fairy around the glade and scoop up every shimmering coin.
 
+
 ## Testing the project
 
 The prototype does not ship with automated unit tests yet, so testing is a manual process:
@@ -30,6 +31,7 @@ The prototype does not ship with automated unit tests yet, so testing is a manua
    ```
 
    Open the logged preview URL in your browser, confirm the scene loads, collect a few coins, and verify the counter updates. This is the best way to check everything end-to-end until automated coverage is added.
+
 
 ## Scripts
 
@@ -59,6 +61,7 @@ The prototype does not ship with automated unit tests yet, so testing is a manua
 
 The scene uses instanced meshes for trees, a smooth-follow camera, and simple collision checks for coin collection to keep the prototype lightweight and easy to extend.
 
+
 ## Troubleshooting
 
 - **"ReactSharedInternals is undefined" in the browser console** – reinstall dependencies so that `react-reconciler@^0.29.0` is present:
@@ -69,3 +72,4 @@ The scene uses instanced meshes for trees, a smooth-follow camera, and simple co
   ```
 
   The updated reconciler runtime restores compatibility between React 18 and the React Three Fiber renderer that drives the scene.
+
