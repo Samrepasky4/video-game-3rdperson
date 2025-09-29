@@ -11,21 +11,44 @@ const matrix = new Matrix4();
 const quaternion = new Quaternion();
 const scaleVector = new Vector3();
 
-const createTreeDistribution = (count: number) =>
-  Array.from({ length: count }, (_, index) => {
-    const angle = (index / count) * Math.PI * 2;
-    const radius = 8 + (index % 7) + Math.sin(index * 1.3) * 1.5;
-    const height = 2.4 + ((index * 1.7) % 1.2);
-    return {
+const wrapAngle = (value: number) => {
+  let result = ((value + Math.PI) % (Math.PI * 2)) - Math.PI;
+  if (result < -Math.PI) result += Math.PI * 2;
+  return result;
+};
+
+const createTreeDistribution = (count: number) => {
+  const walkwayCenter = -Math.PI / 2;
+  const walkwayHalfWidth = 0.7;
+  const trees: TreeInstance[] = [];
+  let index = 0;
+
+  while (trees.length < count) {
+    const angle = (index / (count * 1.2)) * Math.PI * 2;
+    index += 1;
+
+    if (Math.abs(wrapAngle(angle - walkwayCenter)) < walkwayHalfWidth) {
+      continue;
+    }
+
+    const radius = 9 + (index % 7) * 0.9 + Math.sin(index * 0.9) * 1.1;
+    const height = 2.4 + ((index * 1.3) % 1.1);
+
+    trees.push({
       position: new Vector3(Math.cos(angle) * radius, 0, Math.sin(angle) * radius),
       scale: height,
-    } satisfies TreeInstance;
-  });
+    });
+  }
+
+  return trees;
+};
+
 
 export const ForestEnvironment = () => {
   const trunksRef = useRef<InstancedMesh>(null);
   const canopyRef = useRef<InstancedMesh>(null);
-  const trees = useMemo(() => createTreeDistribution(48), []);
+  const trees = useMemo(() => createTreeDistribution(24), []);
+
 
   useEffect(() => {
     const trunks = trunksRef.current;

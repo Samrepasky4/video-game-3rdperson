@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { Group, Mesh, Vector3 } from 'three';
+
+import { Group, MathUtils, Mesh, Vector3 } from 'three';
+
 import { useFrame } from '@react-three/fiber';
 import { useKeyboardControls } from '../hooks/useKeyboardControls';
 import type { CoinDescriptor } from '../types';
@@ -25,11 +27,12 @@ export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
   const rightWingRef = useRef<Mesh>(null);
   const velocity = useRef(new Vector3());
   const desiredVelocity = useRef(new Vector3());
+  const heading = useRef(0);
   const helpers = useMemo(
     () => ({
       direction: new Vector3(),
       smoothedTarget: new Vector3(),
-      offset: new Vector3(0, 2.6, 5),
+      offset: new Vector3(0, 2.8, 6.2),
       camera: new Vector3(),
       coin: new Vector3(),
     }),
@@ -42,25 +45,27 @@ export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
     if (!player) return;
 
     const { forward, backward, left, right } = controlsRef.current;
-    const direction = helpers.direction.set(
-      Number(right) - Number(left),
-      0,
-      Number(backward) - Number(forward),
-    );
+
+    const direction = helpers.direction
+      .set(Number(right) - Number(left), 0, Number(backward) - Number(forward))
+      .clampLength(0, 1);
 
     const hasInput = direction.lengthSq() > 0;
     if (hasInput) {
-      direction.normalize();
-      desiredVelocity.current.copy(direction).multiplyScalar(6);
-      velocity.current.lerp(desiredVelocity.current, 1 - Math.exp(-12 * delta));
-      const heading = Math.atan2(direction.x, direction.z);
-      player.rotation.y = heading;
+      desiredVelocity.current.copy(direction).multiplyScalar(1.8);
+      velocity.current.lerp(desiredVelocity.current, 1 - Math.exp(-5 * delta));
+      const targetHeading = Math.atan2(direction.x, -direction.z);
+      heading.current = MathUtils.lerpAngle(heading.current, targetHeading, 1 - Math.exp(-18 * delta));
     } else {
-      velocity.current.multiplyScalar(Math.exp(-10 * delta));
-      if (velocity.current.lengthSq() < 0.0001) {
+      velocity.current.multiplyScalar(Math.exp(-4 * delta));
+      if (velocity.current.lengthSq() < 0.0002) {
+
         velocity.current.set(0, 0, 0);
       }
     }
+
+    player.rotation.y = heading.current;
+
 
     player.position.addScaledVector(velocity.current, delta);
     player.position.x = Math.max(-WORLD_BOUNDS, Math.min(WORLD_BOUNDS, player.position.x));
@@ -88,9 +93,10 @@ export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
     }
 
     helpers.camera.copy(helpers.offset).applyAxisAngle(UP, player.rotation.y);
-    helpers.smoothedTarget.lerp(player.position, 1 - Math.exp(-8 * delta));
+    helpers.smoothedTarget.lerp(player.position, 1 - Math.exp(-5 * delta));
     helpers.camera.add(helpers.smoothedTarget);
-    camera.position.lerp(helpers.camera, 1 - Math.exp(-4 * delta));
+    camera.position.lerp(helpers.camera, 1 - Math.exp(-3 * delta));
+
     camera.lookAt(player.position.x, player.position.y + 0.6, player.position.z);
   });
 
