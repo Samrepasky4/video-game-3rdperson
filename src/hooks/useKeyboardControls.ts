@@ -11,19 +11,23 @@ type ControlState = {
 const CONTROL_PRESETS: Record<keyof ControlState, string[]> = {
   forward: ['KeyW', 'ArrowUp'],
   backward: ['KeyS', 'ArrowDown'],
-  left: ['KeyA', 'ArrowLeft'],
-  right: ['KeyD', 'ArrowRight'],
+
+  left: ['KeyA', 'ArrowRight'],
+  right: ['KeyD', 'ArrowLeft'],
   jump: ['Space'],
 };
 
+const INITIAL_STATE: ControlState = {
+  forward: false,
+  backward: false,
+  left: false,
+  right: false,
+  jump: false,
+};
+
 export const useKeyboardControls = (): ControlState => {
-  const [state, setState] = useState<ControlState>({
-    forward: false,
-    backward: false,
-    left: false,
-    right: false,
-    jump: false,
-  });
+  const [state, setState] = useState<ControlState>(INITIAL_STATE);
+
 
   const keyToControl = useMemo(() => {
     const map = new Map<string, keyof ControlState>();
@@ -36,16 +40,31 @@ export const useKeyboardControls = (): ControlState => {
   }, []);
 
   useEffect(() => {
+
+    const updateState = (control: keyof ControlState, value: boolean) => {
+      setState((previous) => {
+        if (previous[control] === value) {
+          return previous;
+        }
+        return { ...previous, [control]: value };
+      });
+    };
+
     const handleKeyDown = (event: KeyboardEvent) => {
       const control = keyToControl.get(event.code);
       if (!control) return;
-      setState((previous) => ({ ...previous, [control]: true }));
+      event.preventDefault();
+      updateState(control, true);
+
     };
 
     const handleKeyUp = (event: KeyboardEvent) => {
       const control = keyToControl.get(event.code);
       if (!control) return;
-      setState((previous) => ({ ...previous, [control]: false }));
+
+      event.preventDefault();
+      updateState(control, false);
+
     };
 
     window.addEventListener('keydown', handleKeyDown);

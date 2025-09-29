@@ -61,7 +61,6 @@ The prototype does not ship with automated unit tests yet, so testing is a manua
 
 The scene uses instanced meshes for trees, a smooth-follow camera, and simple collision checks for coin collection to keep the prototype lightweight and easy to extend.
 
-
 ## Troubleshooting
 
 - **"ReactSharedInternals is undefined" in the browser console** – reinstall dependencies so that `react-reconciler@^0.29.0` is present:

@@ -101,7 +101,6 @@ export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
     helpers.smoothedTarget.lerp(player.position, 1 - Math.exp(-5 * delta));
     helpers.camera.add(helpers.smoothedTarget);
     camera.position.lerp(helpers.camera, 1 - Math.exp(-3 * delta));
-
     camera.lookAt(player.position.x, player.position.y + 0.6, player.position.z);
   });
 
