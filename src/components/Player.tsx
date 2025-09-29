@@ -1,4 +1,3 @@
-
 import { useMemo, useRef } from 'react';
 import { Group, MathUtils, Mesh, Vector3 } from 'three';
 import { useFrame } from '@react-three/fiber';
@@ -57,8 +56,6 @@ export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
     }
 
     player.rotation.y = heading.current;
-
-
     player.position.addScaledVector(velocity.current, delta);
     player.position.x = Math.max(-WORLD_BOUNDS, Math.min(WORLD_BOUNDS, player.position.x));
     player.position.z = Math.max(-WORLD_BOUNDS, Math.min(WORLD_BOUNDS, player.position.z));
