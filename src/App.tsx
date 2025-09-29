@@ -40,7 +40,6 @@ const App = () => {
       </div>
 
       <Canvas shadows camera={{ position: [0, 3.5, -7], fov: 50 }} dpr={[1, 2]}>
-
         <Suspense fallback={null}>
           <ForestEnvironment />
           <Fireflies count={80} />

@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+
+import { useEffect, useMemo, useRef } from 'react';
 
 type ControlState = {
   forward: boolean;
@@ -17,16 +18,18 @@ const CONTROL_PRESETS: Record<keyof ControlState, string[]> = {
   jump: ['Space'],
 };
 
-const INITIAL_STATE: ControlState = {
+
+const INITIAL_STATE: ControlState = Object.freeze({
+
   forward: false,
   backward: false,
   left: false,
   right: false,
   jump: false,
-};
+});
 
-export const useKeyboardControls = (): ControlState => {
-  const [state, setState] = useState<ControlState>(INITIAL_STATE);
+export const useKeyboardControls = () => {
+  const stateRef = useRef<ControlState>({ ...INITIAL_STATE });
 
 
   const keyToControl = useMemo(() => {
@@ -41,20 +44,13 @@ export const useKeyboardControls = (): ControlState => {
 
   useEffect(() => {
 
-    const updateState = (control: keyof ControlState, value: boolean) => {
-      setState((previous) => {
-        if (previous[control] === value) {
-          return previous;
-        }
-        return { ...previous, [control]: value };
-      });
-    };
-
     const handleKeyDown = (event: KeyboardEvent) => {
       const control = keyToControl.get(event.code);
       if (!control) return;
       event.preventDefault();
-      updateState(control, true);
+
+      if (stateRef.current[control]) return;
+      stateRef.current = { ...stateRef.current, [control]: true };
 
     };
 
@@ -63,7 +59,9 @@ export const useKeyboardControls = (): ControlState => {
       if (!control) return;
 
       event.preventDefault();
-      updateState(control, false);
+
+      if (!stateRef.current[control]) return;
+      stateRef.current = { ...stateRef.current, [control]: false };
 
     };
 
@@ -76,5 +74,7 @@ export const useKeyboardControls = (): ControlState => {
     };
   }, [keyToControl]);
 
-  return state;
+
+  return stateRef;
+
 };

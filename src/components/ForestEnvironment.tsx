@@ -49,7 +49,6 @@ export const ForestEnvironment = () => {
   const canopyRef = useRef<InstancedMesh>(null);
   const trees = useMemo(() => createTreeDistribution(24), []);
 
-
   useEffect(() => {
     const trunks = trunksRef.current;
     const canopy = canopyRef.current;
