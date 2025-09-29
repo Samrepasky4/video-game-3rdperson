@@ -38,7 +38,9 @@ const App = () => {
         <p>Coins collected: {collected.size} / {coins.length}</p>
         <p>Glide with WASD or the arrow keys to gather shimmering dusk coins.</p>
       </div>
-      <Canvas shadows camera={{ position: [0, 4, 8], fov: 50 }} dpr={[1, 2]}>
+
+      <Canvas shadows camera={{ position: [0, 3.5, -7], fov: 50 }} dpr={[1, 2]}>
+
         <Suspense fallback={null}>
           <ForestEnvironment />
           <Fireflies count={80} />

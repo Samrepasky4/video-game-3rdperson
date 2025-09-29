@@ -32,7 +32,9 @@ export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
     () => ({
       direction: new Vector3(),
       smoothedTarget: new Vector3(),
-      offset: new Vector3(0, 2.8, 6.2),
+
+      offset: new Vector3(0, 2.6, -6.5),
+
       camera: new Vector3(),
       coin: new Vector3(),
     }),
@@ -47,14 +49,17 @@ export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
     const { forward, backward, left, right } = controlsRef.current;
 
     const direction = helpers.direction
-      .set(Number(right) - Number(left), 0, Number(backward) - Number(forward))
+      .set(Number(right) - Number(left), 0, Number(forward) - Number(backward))
+
       .clampLength(0, 1);
 
     const hasInput = direction.lengthSq() > 0;
     if (hasInput) {
       desiredVelocity.current.copy(direction).multiplyScalar(1.8);
       velocity.current.lerp(desiredVelocity.current, 1 - Math.exp(-5 * delta));
-      const targetHeading = Math.atan2(direction.x, -direction.z);
+
+      const targetHeading = Math.atan2(direction.x, direction.z);
+
       heading.current = MathUtils.lerpAngle(heading.current, targetHeading, 1 - Math.exp(-18 * delta));
     } else {
       velocity.current.multiplyScalar(Math.exp(-4 * delta));
