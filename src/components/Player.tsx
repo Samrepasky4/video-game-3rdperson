@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
+
 import { Group, MathUtils, Mesh, Vector3 } from 'three';
+
 import { useFrame } from '@react-three/fiber';
 import { useKeyboardControls } from '../hooks/useKeyboardControls';
 import type { CoinDescriptor } from '../types';
@@ -43,6 +45,7 @@ export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
     if (!player) return;
 
     const { forward, backward, left, right } = controlsRef.current;
+
     const direction = helpers.direction
       .set(Number(right) - Number(left), 0, Number(backward) - Number(forward))
       .clampLength(0, 1);
@@ -56,11 +59,13 @@ export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
     } else {
       velocity.current.multiplyScalar(Math.exp(-4 * delta));
       if (velocity.current.lengthSq() < 0.0002) {
+
         velocity.current.set(0, 0, 0);
       }
     }
 
     player.rotation.y = heading.current;
+
 
     player.position.addScaledVector(velocity.current, delta);
     player.position.x = Math.max(-WORLD_BOUNDS, Math.min(WORLD_BOUNDS, player.position.x));
@@ -91,6 +96,7 @@ export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
     helpers.smoothedTarget.lerp(player.position, 1 - Math.exp(-5 * delta));
     helpers.camera.add(helpers.smoothedTarget);
     camera.position.lerp(helpers.camera, 1 - Math.exp(-3 * delta));
+
     camera.lookAt(player.position.x, player.position.y + 0.6, player.position.z);
   });
 
