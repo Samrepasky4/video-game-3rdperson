@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
+
 import { Group, MathUtils, Mesh, Vector3 } from 'three';
+
 import { useFrame } from '@react-three/fiber';
 import { useKeyboardControls } from '../hooks/useKeyboardControls';
 import type { CoinDescriptor } from '../types';
@@ -30,7 +32,9 @@ export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
     () => ({
       direction: new Vector3(),
       smoothedTarget: new Vector3(),
+
       offset: new Vector3(0, 2.6, -6.5),
+
       camera: new Vector3(),
       coin: new Vector3(),
     }),
@@ -43,24 +47,30 @@ export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
     if (!player) return;
 
     const { forward, backward, left, right } = controlsRef.current;
+
     const direction = helpers.direction
       .set(Number(right) - Number(left), 0, Number(forward) - Number(backward))
+
       .clampLength(0, 1);
 
     const hasInput = direction.lengthSq() > 0;
     if (hasInput) {
       desiredVelocity.current.copy(direction).multiplyScalar(1.8);
       velocity.current.lerp(desiredVelocity.current, 1 - Math.exp(-5 * delta));
+
       const targetHeading = Math.atan2(direction.x, direction.z);
+
       heading.current = MathUtils.lerpAngle(heading.current, targetHeading, 1 - Math.exp(-18 * delta));
     } else {
       velocity.current.multiplyScalar(Math.exp(-4 * delta));
       if (velocity.current.lengthSq() < 0.0002) {
+
         velocity.current.set(0, 0, 0);
       }
     }
 
     player.rotation.y = heading.current;
+
 
     player.position.addScaledVector(velocity.current, delta);
     player.position.x = Math.max(-WORLD_BOUNDS, Math.min(WORLD_BOUNDS, player.position.x));

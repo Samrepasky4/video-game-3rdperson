@@ -11,6 +11,7 @@ type ControlState = {
 const CONTROL_PRESETS: Record<keyof ControlState, string[]> = {
   forward: ['KeyW', 'ArrowUp'],
   backward: ['KeyS', 'ArrowDown'],
+
   left: ['KeyA', 'ArrowRight'],
   right: ['KeyD', 'ArrowLeft'],
   jump: ['Space'],
@@ -27,6 +28,7 @@ const INITIAL_STATE: ControlState = {
 export const useKeyboardControls = (): ControlState => {
   const [state, setState] = useState<ControlState>(INITIAL_STATE);
 
+
   const keyToControl = useMemo(() => {
     const map = new Map<string, keyof ControlState>();
     (Object.keys(CONTROL_PRESETS) as (keyof ControlState)[]).forEach((control) => {
@@ -38,6 +40,7 @@ export const useKeyboardControls = (): ControlState => {
   }, []);
 
   useEffect(() => {
+
     const updateState = (control: keyof ControlState, value: boolean) => {
       setState((previous) => {
         if (previous[control] === value) {
@@ -52,13 +55,16 @@ export const useKeyboardControls = (): ControlState => {
       if (!control) return;
       event.preventDefault();
       updateState(control, true);
+
     };
 
     const handleKeyUp = (event: KeyboardEvent) => {
       const control = keyToControl.get(event.code);
       if (!control) return;
+
       event.preventDefault();
       updateState(control, false);
+
     };
 
     window.addEventListener('keydown', handleKeyDown);
