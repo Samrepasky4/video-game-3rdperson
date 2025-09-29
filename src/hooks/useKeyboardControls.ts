@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useRef } from 'react';
 
 type ControlState = {
@@ -11,12 +12,15 @@ type ControlState = {
 const CONTROL_PRESETS: Record<keyof ControlState, string[]> = {
   forward: ['KeyW', 'ArrowUp'],
   backward: ['KeyS', 'ArrowDown'],
+
   left: ['KeyA', 'ArrowRight'],
   right: ['KeyD', 'ArrowLeft'],
   jump: ['Space'],
 };
 
+
 const INITIAL_STATE: ControlState = Object.freeze({
+
   forward: false,
   backward: false,
   left: false,
@@ -26,6 +30,7 @@ const INITIAL_STATE: ControlState = Object.freeze({
 
 export const useKeyboardControls = () => {
   const stateRef = useRef<ControlState>({ ...INITIAL_STATE });
+
 
   const keyToControl = useMemo(() => {
     const map = new Map<string, keyof ControlState>();
@@ -38,6 +43,7 @@ export const useKeyboardControls = () => {
   }, []);
 
   useEffect(() => {
+
     const handleKeyDown = (event: KeyboardEvent) => {
       const control = keyToControl.get(event.code);
       if (!control) return;
@@ -45,15 +51,18 @@ export const useKeyboardControls = () => {
 
       if (stateRef.current[control]) return;
       stateRef.current = { ...stateRef.current, [control]: true };
+
     };
 
     const handleKeyUp = (event: KeyboardEvent) => {
       const control = keyToControl.get(event.code);
       if (!control) return;
+
       event.preventDefault();
 
       if (!stateRef.current[control]) return;
       stateRef.current = { ...stateRef.current, [control]: false };
+
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -65,5 +74,7 @@ export const useKeyboardControls = () => {
     };
   }, [keyToControl]);
 
+
   return stateRef;
+
 };
