@@ -1,0 +1,352 @@
+import { useEffect, useMemo, useRef, type MutableRefObject } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { InstancedMesh, Matrix4, Quaternion, Vector3, type Group } from 'three';
+import { Sky, Stars } from '@react-three/drei';
+
+type TreeInstance = {
+  position: Vector3;
+  scale: number;
+  rotation: number;
+};
+
+type ForestLayout = {
+  pines: TreeInstance[];
+  oaks: TreeInstance[];
+  birch: TreeInstance[];
+  shrubs: TreeInstance[];
+  grass: TreeInstance[];
+};
+
+const matrix = new Matrix4();
+const quaternion = new Quaternion();
+const scaleVector = new Vector3();
+const positionVector = new Vector3();
+const UP = new Vector3(0, 1, 0);
+
+const PINE_TRUNK_SCALE = new Vector3(0.26, 0.9, 0.26);
+const PINE_CANOPY_SCALE = new Vector3(0.9, 1.6, 0.9);
+const OAK_TRUNK_SCALE = new Vector3(0.32, 0.75, 0.32);
+const OAK_CANOPY_SCALE = new Vector3(1.3, 1.1, 1.3);
+const BIRCH_TRUNK_SCALE = new Vector3(0.18, 1.2, 0.18);
+const BIRCH_LEAF_SCALE = new Vector3(0.9, 0.9, 0.9);
+const SHRUB_SCALE = new Vector3(0.9, 0.6, 0.9);
+const GRASS_SCALE = new Vector3(0.35, 0.9, 0.35);
+
+const mulberry32 = (seed: number) => {
+  return () => {
+    let t = seed += 0x6d2b79f5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+};
+
+const createForestLayout = (): ForestLayout => {
+  const rand = mulberry32(1337);
+  const pines: TreeInstance[] = [];
+  const oaks: TreeInstance[] = [];
+  const birch: TreeInstance[] = [];
+  const shrubs: TreeInstance[] = [];
+  const grass: TreeInstance[] = [];
+
+  const totalTrees = 28;
+  const placedTreePositions: Vector3[] = [];
+  const minTreeSpacing = 5.2;
+  const maxAttempts = 1400;
+  let attempts = 0;
+
+  while (pines.length + oaks.length + birch.length < totalTrees && attempts < maxAttempts) {
+    attempts += 1;
+
+    const x = rand() * 160 - 80;
+    const z = rand() * 150 - 70;
+
+    if (Math.abs(x) < 4.8 && z > -8 && z < 26) {
+      continue;
+    }
+
+    const candidate = new Vector3(x, 0, z);
+    const tooClose = placedTreePositions.some((position) => position.distanceToSquared(candidate) < minTreeSpacing * minTreeSpacing);
+    if (tooClose) {
+      continue;
+    }
+
+    const rotation = rand() * Math.PI * 2;
+    const roll = rand();
+    const scaleBase = 1.6 + rand() * 1.4;
+
+    if (roll < 0.42) {
+      pines.push({ position: candidate, scale: scaleBase * 1.6, rotation });
+    } else if (roll < 0.78) {
+      oaks.push({ position: candidate, scale: scaleBase * 1.2, rotation });
+    } else {
+      birch.push({ position: candidate, scale: scaleBase, rotation });
+    }
+
+    placedTreePositions.push(candidate);
+  }
+
+  const shrubCount = 52;
+  for (let index = 0; index < shrubCount; index += 1) {
+    const x = rand() * 150 - 75;
+    const z = rand() * 140 - 65;
+    if (Math.abs(x) < 3.5 && z > -7 && z < 24) continue;
+    shrubs.push({ position: new Vector3(x, 0, z), scale: 0.6 + rand() * 0.9, rotation: rand() * Math.PI * 2 });
+  }
+
+  const grassCount = 160;
+  for (let index = 0; index < grassCount; index += 1) {
+    const x = rand() * 170 - 85;
+    const z = rand() * 160 - 75;
+    if (Math.abs(x) < 2.5 && z > -6 && z < 20 && rand() < 0.55) continue;
+    grass.push({ position: new Vector3(x, 0, z), scale: 0.7 + rand() * 0.6, rotation: rand() * Math.PI * 2 });
+  }
+
+  return { pines, oaks, birch, shrubs, grass };
+};
+
+type ForestEnvironmentProps = {
+  playerRef: MutableRefObject<Group | null>;
+};
+
+const applyInstances = (
+  mesh: InstancedMesh | null,
+  items: TreeInstance[],
+  scaleMultiplier: Vector3,
+  computeY: (item: TreeInstance, height: number) => number = (item, height) => item.position.y + height / 2,
+) => {
+  if (!mesh) return;
+
+  mesh.frustumCulled = false;
+
+  items.forEach((item, index) => {
+    quaternion.setFromAxisAngle(UP, item.rotation);
+    const height = scaleMultiplier.y * item.scale;
+    matrix.compose(
+      positionVector.copy(item.position).setY(computeY(item, height)),
+      quaternion,
+      scaleVector.set(scaleMultiplier.x * item.scale, scaleMultiplier.y * item.scale, scaleMultiplier.z * item.scale),
+    );
+    mesh.setMatrixAt(index, matrix);
+  });
+
+  mesh.instanceMatrix.needsUpdate = true;
+};
+
+const pineCanopyHeight = (item: TreeInstance, height: number) => item.position.y + item.scale * 0.9 + height / 2;
+const oakCanopyHeight = (item: TreeInstance, height: number) => item.position.y + item.scale * 0.75 + height / 2;
+const birchLeavesHeight = (item: TreeInstance, height: number) => item.position.y + item.scale * 1.2 + height / 2;
+
+const updateInstanceVisibility = (
+  mesh: InstancedMesh | null,
+  item: TreeInstance,
+  index: number,
+  scaleMultiplier: Vector3,
+  visible: boolean,
+  computeY: (item: TreeInstance, height: number) => number = (tree, height) => tree.position.y + height / 2,
+) => {
+  if (!mesh) return;
+
+  const appliedScale = visible ? item.scale : 0;
+  quaternion.setFromAxisAngle(UP, item.rotation);
+  const height = scaleMultiplier.y * appliedScale;
+  matrix.compose(
+    positionVector.copy(item.position).setY(computeY(item, height)),
+    quaternion,
+    scaleVector.set(
+      scaleMultiplier.x * appliedScale,
+      scaleMultiplier.y * appliedScale,
+      scaleMultiplier.z * appliedScale,
+    ),
+  );
+  mesh.setMatrixAt(index, matrix);
+  mesh.instanceMatrix.needsUpdate = true;
+};
+
+export const ForestEnvironment = ({ playerRef }: ForestEnvironmentProps) => {
+  const pineTrunksRef = useRef<InstancedMesh>(null);
+  const pineCanopyRef = useRef<InstancedMesh>(null);
+  const oakTrunksRef = useRef<InstancedMesh>(null);
+  const oakCanopyRef = useRef<InstancedMesh>(null);
+  const birchTrunksRef = useRef<InstancedMesh>(null);
+  const birchLeavesRef = useRef<InstancedMesh>(null);
+  const shrubsRef = useRef<InstancedMesh>(null);
+  const grassRef = useRef<InstancedMesh>(null);
+  const layout = useMemo(() => createForestLayout(), []);
+  const occlusionState = useRef({
+    pines: new Array(layout.pines.length).fill(false),
+    oaks: new Array(layout.oaks.length).fill(false),
+    birch: new Array(layout.birch.length).fill(false),
+  });
+  const occlusionHelpers = useMemo(
+    () => ({
+      cameraToPlayer: new Vector3(),
+      direction: new Vector3(),
+      cameraToTree: new Vector3(),
+    }),
+    [],
+  );
+  const setPineVisibility = (index: number, visible: boolean) => {
+    const item = layout.pines[index];
+    updateInstanceVisibility(pineTrunksRef.current, item, index, PINE_TRUNK_SCALE, visible);
+    updateInstanceVisibility(pineCanopyRef.current, item, index, PINE_CANOPY_SCALE, visible, pineCanopyHeight);
+  };
+  const setOakVisibility = (index: number, visible: boolean) => {
+    const item = layout.oaks[index];
+    updateInstanceVisibility(oakTrunksRef.current, item, index, OAK_TRUNK_SCALE, visible);
+    updateInstanceVisibility(oakCanopyRef.current, item, index, OAK_CANOPY_SCALE, visible, oakCanopyHeight);
+  };
+  const setBirchVisibility = (index: number, visible: boolean) => {
+    const item = layout.birch[index];
+    updateInstanceVisibility(birchTrunksRef.current, item, index, BIRCH_TRUNK_SCALE, visible);
+    updateInstanceVisibility(birchLeavesRef.current, item, index, BIRCH_LEAF_SCALE, visible, birchLeavesHeight);
+  };
+
+  useEffect(() => {
+    applyInstances(pineTrunksRef.current, layout.pines, PINE_TRUNK_SCALE);
+    applyInstances(pineCanopyRef.current, layout.pines, PINE_CANOPY_SCALE, pineCanopyHeight);
+    applyInstances(oakTrunksRef.current, layout.oaks, OAK_TRUNK_SCALE);
+    applyInstances(oakCanopyRef.current, layout.oaks, OAK_CANOPY_SCALE, oakCanopyHeight);
+    applyInstances(birchTrunksRef.current, layout.birch, BIRCH_TRUNK_SCALE);
+    applyInstances(birchLeavesRef.current, layout.birch, BIRCH_LEAF_SCALE, birchLeavesHeight);
+    applyInstances(shrubsRef.current, layout.shrubs, SHRUB_SCALE, (item, height) => item.position.y + height / 2);
+    applyInstances(grassRef.current, layout.grass, GRASS_SCALE, (item, height) => item.position.y + height / 2);
+  }, [layout]);
+
+  useFrame(({ camera }) => {
+    const player = playerRef.current;
+    if (!player) return;
+
+    const { cameraToPlayer, direction, cameraToTree } = occlusionHelpers;
+    cameraToPlayer.subVectors(player.position, camera.position);
+    const distanceToPlayer = cameraToPlayer.length();
+    if (distanceToPlayer < 0.5) {
+      return;
+    }
+
+    direction.copy(cameraToPlayer).divideScalar(distanceToPlayer);
+    const radiusSq = 1.35 * 1.35;
+
+    const evaluateOcclusion = (
+      items: TreeInstance[],
+      state: boolean[],
+      setVisibility: (index: number, visible: boolean) => void,
+    ) => {
+      items.forEach((item, index) => {
+        cameraToTree.copy(item.position).sub(camera.position);
+        const projection = cameraToTree.dot(direction);
+        let hide = false;
+
+        if (projection > 0 && projection < distanceToPlayer) {
+          const distanceSq = cameraToTree.lengthSq();
+          const perpendicularSq = Math.max(0, distanceSq - projection * projection);
+          hide = perpendicularSq < radiusSq;
+        }
+
+        if (state[index] !== hide) {
+          state[index] = hide;
+          setVisibility(index, !hide);
+        }
+      });
+    };
+
+    evaluateOcclusion(layout.pines, occlusionState.current.pines, setPineVisibility);
+    evaluateOcclusion(layout.oaks, occlusionState.current.oaks, setOakVisibility);
+    evaluateOcclusion(layout.birch, occlusionState.current.birch, setBirchVisibility);
+  });
+
+  return (
+    <group>
+      <Sky
+        distance={42000}
+        sunPosition={[-24, -10, -36]}
+        inclination={0.92}
+        azimuth={0.3}
+        mieCoefficient={0.0022}
+        mieDirectionalG={0.96}
+        rayleigh={0.22}
+        turbidity={1.4}
+        exposure={0.18}
+      />
+      <Stars radius={520} depth={180} count={6200} factor={4.4} saturation={0.8} fade speed={0.22} />
+      <color attach="background" args={['#030a27']} />
+      <fog attach="fog" args={['#081226', 24, 140]} />
+      <hemisphereLight intensity={0.38} skyColor="#1b2f6a" groundColor="#05090f" />
+      <directionalLight
+        position={[22, 18, -12]}
+        intensity={0.4}
+        color="#f9c6ff"
+        castShadow
+        shadow-mapSize={[2048, 2048]}
+        shadow-camera-far={150}
+      />
+      <pointLight position={[-34, 26, -42]} intensity={0.62} color="#ffe0c8" distance={120} decay={2.4} />
+
+      <ambientLight intensity={0.28} color="#6a7fe2" />
+
+      <mesh position={[-34, 26, -42]} castShadow>
+        <sphereGeometry args={[3.6, 64, 64]} />
+        <meshStandardMaterial
+          color="#f7f5e9"
+          emissive="#f0e7c0"
+          emissiveIntensity={0.75}
+          roughness={0.4}
+          metalness={0}
+        />
+      </mesh>
+
+      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[360, 360, 1, 1]} />
+        <meshStandardMaterial color="#0a1516" roughness={0.95} metalness={0.03} />
+      </mesh>
+
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]} receiveShadow>
+        <circleGeometry args={[34, 120]} />
+        <meshStandardMaterial
+          color="#152821"
+          roughness={1}
+          metalness={0}
+          emissive="#0f3128"
+          emissiveIntensity={0.18}
+        />
+      </mesh>
+
+      <instancedMesh ref={pineTrunksRef} args={[undefined, undefined, layout.pines.length]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.2, 0.45, 1, 8]} />
+        <meshStandardMaterial color="#2d1f14" roughness={0.85} />
+      </instancedMesh>
+      <instancedMesh ref={pineCanopyRef} args={[undefined, undefined, layout.pines.length]} castShadow>
+        <coneGeometry args={[1.2, 2.6, 12]} />
+        <meshStandardMaterial color="#2e5c3a" emissive="#1d3d2b" emissiveIntensity={0.35} roughness={0.55} />
+      </instancedMesh>
+
+      <instancedMesh ref={oakTrunksRef} args={[undefined, undefined, layout.oaks.length]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.35, 0.5, 1, 10]} />
+        <meshStandardMaterial color="#3b281c" roughness={0.8} />
+      </instancedMesh>
+      <instancedMesh ref={oakCanopyRef} args={[undefined, undefined, layout.oaks.length]} castShadow>
+        <sphereGeometry args={[1.4, 16, 16]} />
+        <meshStandardMaterial color="#2f6134" emissive="#1d3f24" emissiveIntensity={0.28} roughness={0.6} />
+      </instancedMesh>
+
+      <instancedMesh ref={birchTrunksRef} args={[undefined, undefined, layout.birch.length]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.18, 0.2, 1, 12]} />
+        <meshStandardMaterial color="#d8dfe8" roughness={0.7} emissive="#717a86" emissiveIntensity={0.12} />
+      </instancedMesh>
+      <instancedMesh ref={birchLeavesRef} args={[undefined, undefined, layout.birch.length]} castShadow>
+        <icosahedronGeometry args={[1.2, 0]} />
+        <meshStandardMaterial color="#3b7a4d" emissive="#224d34" emissiveIntensity={0.3} roughness={0.55} />
+      </instancedMesh>
+
+      <instancedMesh ref={shrubsRef} args={[undefined, undefined, layout.shrubs.length]} receiveShadow>
+        <icosahedronGeometry args={[0.8, 0]} />
+        <meshStandardMaterial color="#204f35" emissive="#163728" emissiveIntensity={0.25} roughness={0.8} />
+      </instancedMesh>
+
+      <instancedMesh ref={grassRef} args={[undefined, undefined, layout.grass.length]} receiveShadow>
+        <coneGeometry args={[0.4, 1.2, 6]} />
+        <meshStandardMaterial color="#1f6a3b" emissive="#0f3c24" emissiveIntensity={0.18} roughness={0.9} />
+      </instancedMesh>
+    </group>
+  );
+};
