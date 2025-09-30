@@ -1,4 +1,6 @@
+
 import { useEffect, useMemo, useRef, type MutableRefObject } from 'react';
+
 import { useFrame } from '@react-three/fiber';
 import { InstancedMesh, Matrix4, Quaternion, Vector3, type Group } from 'three';
 import { Sky, Stars } from '@react-three/drei';
@@ -22,7 +24,6 @@ const quaternion = new Quaternion();
 const scaleVector = new Vector3();
 const positionVector = new Vector3();
 const UP = new Vector3(0, 1, 0);
-
 const PINE_TRUNK_SCALE = new Vector3(0.26, 0.9, 0.26);
 const PINE_CANOPY_SCALE = new Vector3(0.9, 1.6, 0.9);
 const OAK_TRUNK_SCALE = new Vector3(0.32, 0.75, 0.32);
@@ -31,7 +32,6 @@ const BIRCH_TRUNK_SCALE = new Vector3(0.18, 1.2, 0.18);
 const BIRCH_LEAF_SCALE = new Vector3(0.9, 0.9, 0.9);
 const SHRUB_SCALE = new Vector3(0.9, 0.6, 0.9);
 const GRASS_SCALE = new Vector3(0.35, 0.9, 0.35);
-
 const mulberry32 = (seed: number) => {
   return () => {
     let t = seed += 0x6d2b79f5;
@@ -48,7 +48,6 @@ const createForestLayout = (): ForestLayout => {
   const birch: TreeInstance[] = [];
   const shrubs: TreeInstance[] = [];
   const grass: TreeInstance[] = [];
-
   const totalTrees = 16;
   const placedTreePositions: Vector3[] = [];
   const minTreeSpacing = 4.4;
@@ -57,7 +56,6 @@ const createForestLayout = (): ForestLayout => {
 
   while (pines.length + oaks.length + birch.length < totalTrees && attempts < maxAttempts) {
     attempts += 1;
-
     const x = rand() * 56 - 28;
     const z = rand() * 48 - 16;
 
@@ -70,7 +68,6 @@ const createForestLayout = (): ForestLayout => {
     if (tooClose) {
       continue;
     }
-
     const rotation = rand() * Math.PI * 2;
     const roll = rand();
     const scaleBase = 1.6 + rand() * 1.4;
@@ -108,7 +105,6 @@ const createForestLayout = (): ForestLayout => {
 type ForestEnvironmentProps = {
   playerRef: MutableRefObject<Group | null>;
 };
-
 const applyInstances = (
   mesh: InstancedMesh | null,
   items: TreeInstance[],
@@ -118,7 +114,6 @@ const applyInstances = (
   if (!mesh) return;
 
   mesh.frustumCulled = false;
-
   items.forEach((item, index) => {
     quaternion.setFromAxisAngle(UP, item.rotation);
     const height = scaleMultiplier.y * item.scale;
@@ -254,7 +249,6 @@ export const ForestEnvironment = ({ playerRef }: ForestEnvironmentProps) => {
     evaluateOcclusion(layout.oaks, occlusionState.current.oaks, setOakVisibility);
     evaluateOcclusion(layout.birch, occlusionState.current.birch, setBirchVisibility);
   });
-
   return (
     <group>
       <Sky
@@ -294,7 +288,6 @@ export const ForestEnvironment = ({ playerRef }: ForestEnvironmentProps) => {
           metalness={0}
         />
       </mesh>
-
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[160, 160, 1, 1]} />
         <meshStandardMaterial color="#0f1b1a" roughness={0.95} metalness={0.03} />

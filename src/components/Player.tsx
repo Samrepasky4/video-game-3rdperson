@@ -14,7 +14,6 @@ const WORLD_BOUNDS = 20;
 const UP = new Vector3(0, 1, 0);
 const MOVE_SPEED = 1.8;
 const TURN_SPEED = 2.6;
-
 export const Player = forwardRef<Group, PlayerProps>(({ coins, collected, onCollect }, ref) => {
   const controlsRef = useKeyboardControls();
 
@@ -37,7 +36,6 @@ export const Player = forwardRef<Group, PlayerProps>(({ coins, collected, onColl
   const bobOffset = useRef(Math.random() * Math.PI * 2);
 
   useImperativeHandle(ref, () => groupRef.current as Group, []);
-
   useFrame(({ camera }, delta) => {
     const player = groupRef.current;
     if (!player) return;
@@ -61,7 +59,6 @@ export const Player = forwardRef<Group, PlayerProps>(({ coins, collected, onColl
     }
 
     player.rotation.y = MathUtils.euclideanModulo(heading.current + Math.PI, Math.PI * 2) - Math.PI;
-
     player.position.addScaledVector(velocity.current, delta);
     player.position.x = Math.max(-WORLD_BOUNDS, Math.min(WORLD_BOUNDS, player.position.x));
     player.position.z = Math.max(-WORLD_BOUNDS, Math.min(WORLD_BOUNDS, player.position.z));
