@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
 import { Group, MathUtils, Mesh, Vector3 } from 'three';
 import { useFrame } from '@react-three/fiber';
 import { useKeyboardControls } from '../hooks/useKeyboardControls';
@@ -14,8 +14,7 @@ const WORLD_BOUNDS = 20;
 const UP = new Vector3(0, 1, 0);
 const MOVE_SPEED = 1.8;
 const TURN_SPEED = 2.6;
-
-export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
+export const Player = forwardRef<Group, PlayerProps>(({ coins, collected, onCollect }, ref) => {
   const controlsRef = useKeyboardControls();
 
   const groupRef = useRef<Group>(null);
@@ -35,7 +34,7 @@ export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
     [],
   );
   const bobOffset = useRef(Math.random() * Math.PI * 2);
-
+  useImperativeHandle(ref, () => groupRef.current as Group, []);
   useFrame(({ camera }, delta) => {
     const player = groupRef.current;
     if (!player) return;
@@ -112,4 +111,6 @@ export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
       <pointLight distance={6} intensity={1.5} color="#ffb6ff" />
     </group>
   );
-};
+});
+
+Player.displayName = 'Player';
