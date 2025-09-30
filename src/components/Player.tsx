@@ -12,6 +12,8 @@ type PlayerProps = {
 
 const WORLD_BOUNDS = 20;
 const UP = new Vector3(0, 1, 0);
+const MOVE_SPEED = 1.8;
+const TURN_SPEED = 2.6;
 
 export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
   const controlsRef = useKeyboardControls();
@@ -38,24 +40,24 @@ export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
     if (!player) return;
 
     const { forward, backward, left, right } = controlsRef.current;
-    const direction = helpers.direction
-      .set(Number(right) - Number(left), 0, Number(forward) - Number(backward))
-      .clampLength(0, 1);
+    const moveInput = Number(forward) - Number(backward);
+    const turnInput = Number(right) - Number(left);
 
-    const hasInput = direction.lengthSq() > 0;
-    if (hasInput) {
-      desiredVelocity.current.copy(direction).multiplyScalar(1.25);
-      velocity.current.lerp(desiredVelocity.current, 1 - Math.exp(-6 * delta));
-      const targetHeading = Math.atan2(direction.x, direction.z);
-      heading.current = MathUtils.lerpAngle(heading.current, targetHeading, 1 - Math.exp(-12 * delta));
-    } else {
-      velocity.current.multiplyScalar(Math.exp(-1.8 * delta));
-      if (velocity.current.lengthSq() < 0.0002) {
-        velocity.current.set(0, 0, 0);
-      }
+    if (turnInput !== 0) {
+      heading.current += turnInput * TURN_SPEED * delta;
     }
 
-    player.rotation.y = heading.current;
+    helpers.direction.set(Math.sin(heading.current), 0, Math.cos(heading.current));
+
+    const targetSpeed = moveInput * MOVE_SPEED;
+    desiredVelocity.current.copy(helpers.direction).multiplyScalar(targetSpeed);
+    velocity.current.lerp(desiredVelocity.current, 1 - Math.exp(-6 * delta));
+
+    if (moveInput === 0 && velocity.current.lengthSq() < 0.0002) {
+      velocity.current.set(0, 0, 0);
+    }
+
+    player.rotation.y = MathUtils.euclideanModulo(heading.current + Math.PI, Math.PI * 2) - Math.PI;
     player.position.addScaledVector(velocity.current, delta);
     player.position.x = Math.max(-WORLD_BOUNDS, Math.min(WORLD_BOUNDS, player.position.x));
     player.position.z = Math.max(-WORLD_BOUNDS, Math.min(WORLD_BOUNDS, player.position.z));
