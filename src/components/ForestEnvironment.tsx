@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useRef, type MutableRefObject } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { InstancedMesh, Matrix4, Quaternion, Vector3, type Group } from 'three';
@@ -22,7 +23,6 @@ const quaternion = new Quaternion();
 const scaleVector = new Vector3();
 const positionVector = new Vector3();
 const UP = new Vector3(0, 1, 0);
-
 const PINE_TRUNK_SCALE = new Vector3(0.26, 0.9, 0.26);
 const PINE_CANOPY_SCALE = new Vector3(0.9, 1.6, 0.9);
 const OAK_TRUNK_SCALE = new Vector3(0.32, 0.75, 0.32);
@@ -31,7 +31,6 @@ const BIRCH_TRUNK_SCALE = new Vector3(0.18, 1.2, 0.18);
 const BIRCH_LEAF_SCALE = new Vector3(0.9, 0.9, 0.9);
 const SHRUB_SCALE = new Vector3(0.9, 0.6, 0.9);
 const GRASS_SCALE = new Vector3(0.35, 0.9, 0.35);
-
 const mulberry32 = (seed: number) => {
   return () => {
     let t = seed += 0x6d2b79f5;
@@ -48,7 +47,6 @@ const createForestLayout = (): ForestLayout => {
   const birch: TreeInstance[] = [];
   const shrubs: TreeInstance[] = [];
   const grass: TreeInstance[] = [];
-
   const totalTrees = 28;
   const placedTreePositions: Vector3[] = [];
   const minTreeSpacing = 5.2;
@@ -70,7 +68,6 @@ const createForestLayout = (): ForestLayout => {
     if (tooClose) {
       continue;
     }
-
     const rotation = rand() * Math.PI * 2;
     const roll = rand();
     const scaleBase = 1.6 + rand() * 1.4;
@@ -99,6 +96,7 @@ const createForestLayout = (): ForestLayout => {
     const x = rand() * 170 - 85;
     const z = rand() * 160 - 75;
     if (Math.abs(x) < 2.5 && z > -6 && z < 20 && rand() < 0.55) continue;
+
     grass.push({ position: new Vector3(x, 0, z), scale: 0.7 + rand() * 0.6, rotation: rand() * Math.PI * 2 });
   }
 
@@ -108,7 +106,6 @@ const createForestLayout = (): ForestLayout => {
 type ForestEnvironmentProps = {
   playerRef: MutableRefObject<Group | null>;
 };
-
 const applyInstances = (
   mesh: InstancedMesh | null,
   items: TreeInstance[],
@@ -118,7 +115,6 @@ const applyInstances = (
   if (!mesh) return;
 
   mesh.frustumCulled = false;
-
   items.forEach((item, index) => {
     quaternion.setFromAxisAngle(UP, item.rotation);
     const height = scaleMultiplier.y * item.scale;

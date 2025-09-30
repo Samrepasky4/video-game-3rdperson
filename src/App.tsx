@@ -1,3 +1,4 @@
+
 import { Suspense, useCallback, useMemo, useRef, useState } from 'react';
 import type { Group } from 'three';
 import { Canvas } from '@react-three/fiber';
@@ -50,7 +51,6 @@ const App = () => {
   const [started, setStarted] = useState(false);
   const [collected, setCollected] = useState<Set<number>>(() => new Set());
   const playerGroupRef = useRef<Group | null>(null);
-
   const handleCollect = useCallback((id: number) => {
     setCollected((previous) => {
       if (previous.has(id)) return previous;
