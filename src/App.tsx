@@ -7,6 +7,7 @@ import { ForestEnvironment } from './components/ForestEnvironment';
 import { Fireflies } from './components/Fireflies';
 import type { CoinDescriptor } from './types';
 
+
 const mulberry32 = (seed: number) => {
   return () => {
     let t = seed += 0x6d2b79f5;
@@ -44,6 +45,7 @@ const generateCoins = (): CoinDescriptor[] => {
   return coins;
 };
 
+
 const App = () => {
   const coins = useMemo(() => generateCoins(), []);
   const [started, setStarted] = useState(false);
@@ -57,6 +59,7 @@ const App = () => {
       return next;
     });
   }, []);
+
 
   if (!started) {
     return (
@@ -74,6 +77,7 @@ const App = () => {
       </div>
     );
   }
+
 
   return (
     <>

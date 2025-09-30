@@ -14,11 +14,13 @@ type ForestLayout = {
   birch: TreeInstance[];
   shrubs: TreeInstance[];
   grass: TreeInstance[];
+
 };
 
 const matrix = new Matrix4();
 const quaternion = new Quaternion();
 const scaleVector = new Vector3();
+
 const UP = new Vector3(0, 1, 0);
 
 const mulberry32 = (seed: number) => {
@@ -215,6 +217,7 @@ export const ForestEnvironment = () => {
       <instancedMesh ref={grassRef} args={[undefined, undefined, layout.grass.length]} receiveShadow>
         <coneGeometry args={[0.4, 1.2, 6]} />
         <meshStandardMaterial color="#1f6a3b" emissive="#0f3c24" emissiveIntensity={0.18} roughness={0.9} />
+
       </instancedMesh>
     </group>
   );
