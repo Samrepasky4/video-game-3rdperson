@@ -198,7 +198,7 @@ export const ForestEnvironment = () => {
           roughness={0.4}
           metalness={0}
         />
-      </mesh
+      </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[160, 160, 1, 1]} />
         <meshStandardMaterial color="#0f1b1a" roughness={0.95} metalness={0.03} />

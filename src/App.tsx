@@ -62,10 +62,9 @@ const App = () => {
     return (
       <div className="landing">
         <div className="landing__panel">
-          <h1>Fairy Forest Drift</h1>
+          <h1>Fairy Forest </h1>
           <p>
-            Drift through a twilight grove as a luminous fairy, gather resonant coins, and let your ambient
-            soundtrack carry the journey.
+            You're a Fairy :-P
           </p>
           <button type="button" onClick={() => setStarted(true)}>
             Play
