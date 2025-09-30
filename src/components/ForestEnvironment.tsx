@@ -14,13 +14,11 @@ type ForestLayout = {
   birch: TreeInstance[];
   shrubs: TreeInstance[];
   grass: TreeInstance[];
-
 };
 
 const matrix = new Matrix4();
 const quaternion = new Quaternion();
 const scaleVector = new Vector3();
-
 const UP = new Vector3(0, 1, 0);
 
 const mulberry32 = (seed: number) => {
@@ -40,7 +38,8 @@ const createForestLayout = (): ForestLayout => {
   const shrubs: TreeInstance[] = [];
   const grass: TreeInstance[] = [];
 
-  const totalTrees = 52;
+
+  const totalTrees = 34;
   while (pines.length + oaks.length + birch.length < totalTrees) {
     const x = rand() * 48 - 24;
     const z = rand() * 48 - 16;
@@ -62,7 +61,7 @@ const createForestLayout = (): ForestLayout => {
     }
   }
 
-  const shrubCount = 60;
+  const shrubCount = 42;
   for (let index = 0; index < shrubCount; index += 1) {
     const x = rand() * 46 - 23;
     const z = rand() * 46 - 14;
@@ -70,7 +69,8 @@ const createForestLayout = (): ForestLayout => {
     shrubs.push({ position: new Vector3(x, 0, z), scale: 0.6 + rand() * 0.9, rotation: rand() * Math.PI * 2 });
   }
 
-  const grassCount = 160;
+
+  const grassCount = 110;
   for (let index = 0; index < grassCount; index += 1) {
     const x = rand() * 50 - 25;
     const z = rand() * 50 - 18;
@@ -88,7 +88,7 @@ const applyInstances = (
   computeY: (item: TreeInstance, height: number) => number = (item, height) => item.position.y + height / 2,
 ) => {
   if (!mesh) return;
-
+  mesh.frustumCulled = false;
   items.forEach((item, index) => {
     quaternion.setFromAxisAngle(UP, item.rotation);
     const height = scaleMultiplier.y * item.scale;
@@ -152,20 +152,31 @@ export const ForestEnvironment = () => {
 
   return (
     <group>
-      <Sky distance={45000} sunPosition={[5, 5, -15]} inclination={0.58} azimuth={0.4} mieCoefficient={0.01} rayleigh={1.9} turbidity={7} />
-      <Stars radius={140} depth={60} count={4500} factor={5} saturation={0.5} fade speed={0.4} />
-      <color attach="background" args={['#10162c']} />
-      <fog attach="fog" args={['#111b33', 18, 80]} />
-      <hemisphereLight intensity={0.55} skyColor="#a4b7ff" groundColor="#1a1e36" />
+      <Sky
+        distance={45000}
+        sunPosition={[-6, 8, -12]}
+        inclination={0.64}
+        azimuth={0.22}
+        mieCoefficient={0.015}
+        mieDirectionalG={0.82}
+        rayleigh={2.6}
+        turbidity={9}
+      />
+      <Stars radius={180} depth={50} count={2500} factor={4} saturation={0.7} fade speed={0.2} />
+      <color attach="background" args={['#34133f']} />
+      <fog attach="fog" args={['#402047', 18, 70]} />
+      <hemisphereLight intensity={0.6} skyColor="#ffba9a" groundColor="#1b1a2e" />
       <directionalLight
         position={[12, 9, 8]}
-        intensity={0.9}
-        color="#ff9d7a"
+        intensity={0.95}
+        color="#ffb26f"
+
         castShadow
         shadow-mapSize={[2048, 2048]}
         shadow-camera-far={70}
       />
 
+      <ambientLight intensity={0.35} color="#a45ce8" />
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[160, 160, 1, 1]} />
         <meshStandardMaterial color="#0f1b1a" roughness={0.95} metalness={0.03} />
@@ -217,7 +228,6 @@ export const ForestEnvironment = () => {
       <instancedMesh ref={grassRef} args={[undefined, undefined, layout.grass.length]} receiveShadow>
         <coneGeometry args={[0.4, 1.2, 6]} />
         <meshStandardMaterial color="#1f6a3b" emissive="#0f3c24" emissiveIntensity={0.18} roughness={0.9} />
-
       </instancedMesh>
     </group>
   );
