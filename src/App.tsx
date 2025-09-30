@@ -1,5 +1,4 @@
-import { Suspense, useCallback, useMemo, useRef, useState } from 'react';
-import type { Group } from 'three';
+import { Suspense, useCallback, useMemo, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Loader } from '@react-three/drei';
 import { Coins } from './components/Coins';
@@ -49,6 +48,7 @@ const App = () => {
   const coins = useMemo(() => generateCoins(), []);
   const [started, setStarted] = useState(false);
   const [collected, setCollected] = useState<Set<number>>(() => new Set());
+
   const handleCollect = useCallback((id: number) => {
     setCollected((previous) => {
       if (previous.has(id)) return previous;
@@ -105,9 +105,9 @@ const App = () => {
       </div>
       <Canvas shadows camera={{ position: [0, 3.5, -7], fov: 50 }} dpr={[1, 2]}>
         <Suspense fallback={null}>
-          <ForestEnvironment playerRef={playerRef} />
+          <ForestEnvironment playerRef={playerRef}/>
           <Fireflies count={80} />
-          <Player ref={playerRef} coins={coins} collected={collected} onCollect={handleCollect} />
+          <Player coins={coins} collected={collected} onCollect={handleCollect} />
           <Coins coins={coins} collected={collected} />
         </Suspense>
       </Canvas>
