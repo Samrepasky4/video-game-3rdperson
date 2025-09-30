@@ -32,6 +32,7 @@ const App = () => {
     });
   }, []);
 
+
   if (!started) {
     return (
       <div className="landing">
@@ -48,6 +49,7 @@ const App = () => {
       </div>
     );
   }
+
 
   return (
     <>

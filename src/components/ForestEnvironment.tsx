@@ -43,6 +43,7 @@ const createTreeDistribution = (count: number) => {
   return trees;
 };
 
+
 export const ForestEnvironment = () => {
   const trunksRef = useRef<InstancedMesh>(null);
   const canopyRef = useRef<InstancedMesh>(null);

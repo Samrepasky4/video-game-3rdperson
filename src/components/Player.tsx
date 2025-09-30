@@ -17,7 +17,6 @@ const TURN_SPEED = 2.6;
 
 export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
   const controlsRef = useKeyboardControls();
-
   const groupRef = useRef<Group>(null);
   const leftWingRef = useRef<Mesh>(null);
   const rightWingRef = useRef<Mesh>(null);
@@ -59,7 +58,6 @@ export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
     }
 
     player.rotation.y = MathUtils.euclideanModulo(heading.current + Math.PI, Math.PI * 2) - Math.PI;
-
     player.position.addScaledVector(velocity.current, delta);
     player.position.x = Math.max(-WORLD_BOUNDS, Math.min(WORLD_BOUNDS, player.position.x));
     player.position.z = Math.max(-WORLD_BOUNDS, Math.min(WORLD_BOUNDS, player.position.z));
