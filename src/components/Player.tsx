@@ -47,7 +47,7 @@ export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
       desiredVelocity.current.copy(direction).multiplyScalar(1.25);
       velocity.current.lerp(desiredVelocity.current, 1 - Math.exp(-6 * delta));
       const targetHeading = Math.atan2(direction.x, direction.z);
-      heading.current = MathUtils.lerpAngle(heading.current, targetHeading, 1 - Math.exp(-12 * delta));
+      heading.current = MathUtils.lerp(heading.current, targetHeading, 1 - Math.exp(-12 * delta));
     } else {
       velocity.current.multiplyScalar(Math.exp(-1.8 * delta));
       if (velocity.current.lengthSq() < 0.0002) {
