@@ -59,7 +59,6 @@ export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
     }
 
     player.rotation.y = MathUtils.euclideanModulo(heading.current + Math.PI, Math.PI * 2) - Math.PI;
-
     player.position.addScaledVector(velocity.current, delta);
     player.position.x = Math.max(-WORLD_BOUNDS, Math.min(WORLD_BOUNDS, player.position.x));
     player.position.z = Math.max(-WORLD_BOUNDS, Math.min(WORLD_BOUNDS, player.position.z));
