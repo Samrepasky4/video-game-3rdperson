@@ -20,6 +20,7 @@ const generateCoins = (): CoinDescriptor[] =>
 
 const App = () => {
   const coins = useMemo(() => generateCoins(), []);
+  const [started, setStarted] = useState(false);
   const [collected, setCollected] = useState<Set<number>>(() => new Set());
 
   const handleCollect = useCallback((id: number) => {
@@ -30,6 +31,25 @@ const App = () => {
       return next;
     });
   }, []);
+
+
+  if (!started) {
+    return (
+      <div className="landing">
+        <div className="landing__panel">
+          <h1>Fairy Forest Drift</h1>
+          <p>
+            Drift through a twilight grove as a luminous fairy, gather resonant coins, and let your ambient
+            soundtrack carry the journey.
+          </p>
+          <button type="button" onClick={() => setStarted(true)}>
+            Play
+          </button>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <>

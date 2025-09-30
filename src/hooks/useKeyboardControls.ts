@@ -17,7 +17,6 @@ const CONTROL_PRESETS: Record<keyof ControlState, string[]> = {
 };
 
 const INITIAL_STATE: ControlState = Object.freeze({
-
   forward: false,
   backward: false,
   left: false,
@@ -49,7 +48,6 @@ export const useKeyboardControls = () => {
       }
     };
 
-
     const handleKeyDown = (event: KeyboardEvent) => {
       const control = keyToControl.get(event.code);
       if (!control) return;
@@ -61,7 +59,6 @@ export const useKeyboardControls = () => {
 
       event.preventDefault();
       setControlState(control, true);
-
     };
 
     const handleKeyUp = (event: KeyboardEvent) => {
