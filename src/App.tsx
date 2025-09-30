@@ -1,4 +1,6 @@
+
 import { Suspense, useCallback, useMemo, useRef, useState } from 'react';
+import type { Group } from 'three';
 import { Canvas } from '@react-three/fiber';
 import { Loader } from '@react-three/drei';
 import { Coins } from './components/Coins';

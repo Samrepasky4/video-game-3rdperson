@@ -1,6 +1,5 @@
 
 import { useEffect, useMemo, useRef, type MutableRefObject } from 'react';
-
 import { useFrame } from '@react-three/fiber';
 import { InstancedMesh, Matrix4, Quaternion, Vector3, type Group } from 'three';
 import { Sky, Stars } from '@react-three/drei';
@@ -48,18 +47,19 @@ const createForestLayout = (): ForestLayout => {
   const birch: TreeInstance[] = [];
   const shrubs: TreeInstance[] = [];
   const grass: TreeInstance[] = [];
-  const totalTrees = 16;
+  const totalTrees = 28;
   const placedTreePositions: Vector3[] = [];
-  const minTreeSpacing = 4.4;
-  const maxAttempts = 720;
+  const minTreeSpacing = 5.2;
+  const maxAttempts = 1400;
   let attempts = 0;
 
   while (pines.length + oaks.length + birch.length < totalTrees && attempts < maxAttempts) {
     attempts += 1;
-    const x = rand() * 56 - 28;
-    const z = rand() * 48 - 16;
 
-    if (Math.abs(x) < 3.2 && z > -6 && z < 20) {
+    const x = rand() * 160 - 80;
+    const z = rand() * 150 - 70;
+
+    if (Math.abs(x) < 4.8 && z > -8 && z < 26) {
       continue;
     }
 
@@ -83,19 +83,20 @@ const createForestLayout = (): ForestLayout => {
     placedTreePositions.push(candidate);
   }
 
-  const shrubCount = 28;
+  const shrubCount = 52;
   for (let index = 0; index < shrubCount; index += 1) {
-    const x = rand() * 46 - 23;
-    const z = rand() * 46 - 14;
-    if (Math.abs(x) < 2.4 && z > -5 && z < 18) continue;
+    const x = rand() * 150 - 75;
+    const z = rand() * 140 - 65;
+    if (Math.abs(x) < 3.5 && z > -7 && z < 24) continue;
     shrubs.push({ position: new Vector3(x, 0, z), scale: 0.6 + rand() * 0.9, rotation: rand() * Math.PI * 2 });
   }
 
-  const grassCount = 72;
+  const grassCount = 160;
   for (let index = 0; index < grassCount; index += 1) {
-    const x = rand() * 50 - 25;
-    const z = rand() * 50 - 18;
-    if (Math.abs(x) < 1.8 && z > -4 && z < 16 && rand() < 0.5) continue;
+    const x = rand() * 170 - 85;
+    const z = rand() * 160 - 75;
+    if (Math.abs(x) < 2.5 && z > -6 && z < 20 && rand() < 0.55) continue;
+
     grass.push({ position: new Vector3(x, 0, z), scale: 0.7 + rand() * 0.6, rotation: rand() * Math.PI * 2 });
   }
 
@@ -249,58 +250,60 @@ export const ForestEnvironment = ({ playerRef }: ForestEnvironmentProps) => {
     evaluateOcclusion(layout.oaks, occlusionState.current.oaks, setOakVisibility);
     evaluateOcclusion(layout.birch, occlusionState.current.birch, setBirchVisibility);
   });
+
   return (
     <group>
       <Sky
-        distance={45000}
-        sunPosition={[-18, -6, -24]}
-        inclination={0.95}
-        azimuth={0.34}
-        mieCoefficient={0.001}
-        mieDirectionalG={0.97}
-        rayleigh={0.3}
-        turbidity={1.8}
-        exposure={0.25}
+        distance={42000}
+        sunPosition={[-24, -10, -36]}
+        inclination={0.92}
+        azimuth={0.3}
+        mieCoefficient={0.0022}
+        mieDirectionalG={0.96}
+        rayleigh={0.22}
+        turbidity={1.4}
+        exposure={0.18}
       />
-      <Stars radius={240} depth={80} count={3200} factor={3} saturation={0.6} fade speed={0.18} />
-      <color attach="background" args={['#07102c']} />
-      <fog attach="fog" args={['#0d1b3a', 18, 70]} />
-      <hemisphereLight intensity={0.4} skyColor="#1a2c63" groundColor="#0d141f" />
+      <Stars radius={520} depth={180} count={6200} factor={4.4} saturation={0.8} fade speed={0.22} />
+      <color attach="background" args={['#030a27']} />
+      <fog attach="fog" args={['#081226', 24, 140]} />
+      <hemisphereLight intensity={0.38} skyColor="#1b2f6a" groundColor="#05090f" />
       <directionalLight
-        position={[14, 12, -6]}
-        intensity={0.45}
-        color="#a7b5ff"
+        position={[22, 18, -12]}
+        intensity={0.4}
+        color="#f9c6ff"
         castShadow
         shadow-mapSize={[2048, 2048]}
-        shadow-camera-far={70}
+        shadow-camera-far={150}
       />
-      <pointLight position={[-24, 18, -32]} intensity={0.55} color="#f6f2d9" distance={80} decay={2.5} />
+      <pointLight position={[-34, 26, -42]} intensity={0.62} color="#ffe0c8" distance={120} decay={2.4} />
 
-      <ambientLight intensity={0.25} color="#6475c7" />
+      <ambientLight intensity={0.28} color="#6a7fe2" />
 
-      <mesh position={[-24, 18, -32]} castShadow>
-        <sphereGeometry args={[2.8, 48, 48]} />
+      <mesh position={[-34, 26, -42]} castShadow>
+        <sphereGeometry args={[3.6, 64, 64]} />
         <meshStandardMaterial
           color="#f7f5e9"
           emissive="#f0e7c0"
-          emissiveIntensity={0.9}
+          emissiveIntensity={0.75}
           roughness={0.4}
           metalness={0}
         />
       </mesh>
+
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[160, 160, 1, 1]} />
-        <meshStandardMaterial color="#0f1b1a" roughness={0.95} metalness={0.03} />
+        <planeGeometry args={[360, 360, 1, 1]} />
+        <meshStandardMaterial color="#0a1516" roughness={0.95} metalness={0.03} />
       </mesh>
 
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]} receiveShadow>
-        <circleGeometry args={[28, 96]} />
+        <circleGeometry args={[34, 120]} />
         <meshStandardMaterial
-          color="#1a2e2a"
+          color="#152821"
           roughness={1}
           metalness={0}
-          emissive="#123530"
-          emissiveIntensity={0.12}
+          emissive="#0f3128"
+          emissiveIntensity={0.18}
         />
       </mesh>
 
