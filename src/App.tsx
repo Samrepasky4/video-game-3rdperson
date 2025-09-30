@@ -48,7 +48,7 @@ const App = () => {
   const coins = useMemo(() => generateCoins(), []);
   const [started, setStarted] = useState(false);
   const [collected, setCollected] = useState<Set<number>>(() => new Set());
-
+  const playerGroupRef = useRef<Group | null>(null);
   const handleCollect = useCallback((id: number) => {
     setCollected((previous) => {
       if (previous.has(id)) return previous;
@@ -62,9 +62,10 @@ const App = () => {
     return (
       <div className="landing">
         <div className="landing__panel">
-          <h1>Fairy Forest </h1>
+          <h1>Fairy Forest Drift</h1>
           <p>
-            You're a Fairy :-P
+            Drift through a twilight grove as a luminous fairy, gather resonant coins, and let your ambient
+            soundtrack carry the journey.
           </p>
           <button type="button" onClick={() => setStarted(true)}>
             Play
@@ -105,9 +106,9 @@ const App = () => {
       </div>
       <Canvas shadows camera={{ position: [0, 3.5, -7], fov: 50 }} dpr={[1, 2]}>
         <Suspense fallback={null}>
-          <ForestEnvironment playerRef={playerRef}/>
+          <ForestEnvironment playerRef={playerGroupRef} />
           <Fireflies count={80} />
-          <Player coins={coins} collected={collected} onCollect={handleCollect} />
+          <Player ref={playerGroupRef} coins={coins} collected={collected} onCollect={handleCollect} />
           <Coins coins={coins} collected={collected} />
         </Suspense>
       </Canvas>

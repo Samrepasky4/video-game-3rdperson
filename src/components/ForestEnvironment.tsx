@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useRef, type RefObject } from 'react';
+
+import { useEffect, useMemo, useRef, type MutableRefObject } from 'react';
+
 import { useFrame } from '@react-three/fiber';
 import { InstancedMesh, Matrix4, Quaternion, Vector3, type Group } from 'three';
 import { Sky, Stars } from '@react-three/drei';
@@ -101,7 +103,7 @@ const createForestLayout = (): ForestLayout => {
 };
 
 type ForestEnvironmentProps = {
-  playerRef: RefObject<Group>;
+  playerRef: MutableRefObject<Group | null>;
 };
 const applyInstances = (
   mesh: InstancedMesh | null,
