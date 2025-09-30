@@ -37,26 +37,40 @@ const createForestLayout = (): ForestLayout => {
   const birch: TreeInstance[] = [];
   const shrubs: TreeInstance[] = [];
   const grass: TreeInstance[] = [];
-  const totalTrees = 34;
-  while (pines.length + oaks.length + birch.length < totalTrees) {
-    const x = rand() * 48 - 24;
-    const z = rand() * 48 - 16;
+  const totalTrees = 24;
+  const placedTreePositions: Vector3[] = [];
+  const minTreeSpacing = 3.6;
+  const maxAttempts = 640;
+  let attempts = 0;
+
+  while (pines.length + oaks.length + birch.length < totalTrees && attempts < maxAttempts) {
+    attempts += 1;
+
+    const x = rand() * 52 - 26;
+    const z = rand() * 52 - 18;
 
     if (Math.abs(x) < 3.2 && z > -6 && z < 20) {
       continue;
     }
 
+    const candidate = new Vector3(x, 0, z);
+    const tooClose = placedTreePositions.some((position) => position.distanceToSquared(candidate) < minTreeSpacing * minTreeSpacing);
+    if (tooClose) {
+      continue;
+    }
     const rotation = rand() * Math.PI * 2;
     const roll = rand();
     const scaleBase = 1.6 + rand() * 1.4;
 
     if (roll < 0.42) {
-      pines.push({ position: new Vector3(x, 0, z), scale: scaleBase * 1.6, rotation });
+      pines.push({ position: candidate, scale: scaleBase * 1.6, rotation });
     } else if (roll < 0.78) {
-      oaks.push({ position: new Vector3(x, 0, z), scale: scaleBase * 1.2, rotation });
+      oaks.push({ position: candidate, scale: scaleBase * 1.2, rotation });
     } else {
-      birch.push({ position: new Vector3(x, 0, z), scale: scaleBase, rotation });
+      birch.push({ position: candidate, scale: scaleBase, rotation });
     }
+
+    placedTreePositions.push(candidate);
   }
 
   const shrubCount = 42;
@@ -184,7 +198,7 @@ export const ForestEnvironment = () => {
           roughness={0.4}
           metalness={0}
         />
-      </mesh>
+      </mesh
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[160, 160, 1, 1]} />
         <meshStandardMaterial color="#0f1b1a" roughness={0.95} metalness={0.03} />

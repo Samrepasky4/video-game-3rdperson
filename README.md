@@ -11,7 +11,6 @@ npm run dev
 
 Open the printed local URL to explore the forest. Use `W`, `A`, `S`, `D` or the arrow keys to guide the fairy around the glade and scoop up every shimmering coin.
 
-
 ## Testing the project
 
 The prototype does not ship with automated unit tests yet, so testing is a manual process:
