@@ -49,8 +49,6 @@ const App = () => {
   const coins = useMemo(() => generateCoins(), []);
   const [started, setStarted] = useState(false);
   const [collected, setCollected] = useState<Set<number>>(() => new Set());
-  const playerRef = useRef<Group>(null);
-
   const handleCollect = useCallback((id: number) => {
     setCollected((previous) => {
       if (previous.has(id)) return previous;
