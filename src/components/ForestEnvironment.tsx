@@ -37,7 +37,6 @@ const createForestLayout = (): ForestLayout => {
   const birch: TreeInstance[] = [];
   const shrubs: TreeInstance[] = [];
   const grass: TreeInstance[] = [];
-
   const totalTrees = 24;
   const placedTreePositions: Vector3[] = [];
   const minTreeSpacing = 3.6;
@@ -59,7 +58,6 @@ const createForestLayout = (): ForestLayout => {
     if (tooClose) {
       continue;
     }
-
     const rotation = rand() * Math.PI * 2;
     const roll = rand();
     const scaleBase = 1.6 + rand() * 1.4;
@@ -82,7 +80,6 @@ const createForestLayout = (): ForestLayout => {
     if (Math.abs(x) < 2.4 && z > -5 && z < 18) continue;
     shrubs.push({ position: new Vector3(x, 0, z), scale: 0.6 + rand() * 0.9, rotation: rand() * Math.PI * 2 });
   }
-
   const grassCount = 110;
   for (let index = 0; index < grassCount; index += 1) {
     const x = rand() * 50 - 25;
@@ -101,9 +98,7 @@ const applyInstances = (
   computeY: (item: TreeInstance, height: number) => number = (item, height) => item.position.y + height / 2,
 ) => {
   if (!mesh) return;
-
   mesh.frustumCulled = false;
-
   items.forEach((item, index) => {
     quaternion.setFromAxisAngle(UP, item.rotation);
     const height = scaleMultiplier.y * item.scale;
@@ -203,8 +198,7 @@ export const ForestEnvironment = () => {
           roughness={0.4}
           metalness={0}
         />
-      </mesh>
-
+      </mesh
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[160, 160, 1, 1]} />
         <meshStandardMaterial color="#0f1b1a" roughness={0.95} metalness={0.03} />

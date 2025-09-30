@@ -30,7 +30,7 @@ The prototype does not ship with automated unit tests yet, so testing is a manua
    ```
 
    Open the logged preview URL in your browser, confirm the scene loads, collect a few coins, and verify the counter updates. This is the best way to check everything end-to-end until automated coverage is added.
-
+   
 ## Scripts
 
 - `npm run dev` – start the development server with hot reloading.
@@ -69,3 +69,4 @@ The scene uses instanced meshes for trees, a smooth-follow camera, and simple co
   ```
 
   The updated reconciler runtime restores compatibility between React 18 and the React Three Fiber renderer that drives the scene.
+

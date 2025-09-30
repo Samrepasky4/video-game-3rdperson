@@ -12,6 +12,7 @@ export const Coin = ({ data, collected }: CoinProps) => {
   const ref = useRef<Group>(null);
   const basePosition = useMemo(() => new Vector3(...data.position), [data.position]);
 
+
   useFrame((state, delta) => {
     const group = ref.current;
     if (!group) return;
@@ -44,6 +45,7 @@ export const Coin = ({ data, collected }: CoinProps) => {
         />
       </mesh>
       <pointLight intensity={1.4} distance={3.6} decay={2.5} color="#61ffbf" />
+
     </group>
   );
 };
