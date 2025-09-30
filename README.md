@@ -69,4 +69,3 @@ The scene uses instanced meshes for trees, a smooth-follow camera, and simple co
   ```
 
   The updated reconciler runtime restores compatibility between React 18 and the React Three Fiber renderer that drives the scene.
-
