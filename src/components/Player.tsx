@@ -14,6 +14,7 @@ const WORLD_BOUNDS = 20;
 const UP = new Vector3(0, 1, 0);
 const MOVE_SPEED = 1.8;
 const TURN_SPEED = 2.6;
+
 export const Player = forwardRef<Group, PlayerProps>(({ coins, collected, onCollect }, ref) => {
   const controlsRef = useKeyboardControls();
 
