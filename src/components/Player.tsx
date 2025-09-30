@@ -17,6 +17,7 @@ const TURN_SPEED = 2.6;
 
 export const Player = ({ coins, collected, onCollect }: PlayerProps) => {
   const controlsRef = useKeyboardControls();
+
   const groupRef = useRef<Group>(null);
   const leftWingRef = useRef<Mesh>(null);
   const rightWingRef = useRef<Mesh>(null);

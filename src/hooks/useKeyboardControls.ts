@@ -89,7 +89,6 @@ export const useKeyboardControls = () => {
     window.addEventListener('blur', handleBlur);
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
@@ -99,5 +98,4 @@ export const useKeyboardControls = () => {
   }, [keyToControl]);
 
   return stateRef;
-
 };
