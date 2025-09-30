@@ -37,8 +37,6 @@ const createForestLayout = (): ForestLayout => {
   const birch: TreeInstance[] = [];
   const shrubs: TreeInstance[] = [];
   const grass: TreeInstance[] = [];
-
-
   const totalTrees = 34;
   while (pines.length + oaks.length + birch.length < totalTrees) {
     const x = rand() * 48 - 24;
@@ -68,8 +66,6 @@ const createForestLayout = (): ForestLayout => {
     if (Math.abs(x) < 2.4 && z > -5 && z < 18) continue;
     shrubs.push({ position: new Vector3(x, 0, z), scale: 0.6 + rand() * 0.9, rotation: rand() * Math.PI * 2 });
   }
-
-
   const grassCount = 110;
   for (let index = 0; index < grassCount; index += 1) {
     const x = rand() * 50 - 25;
@@ -154,29 +150,41 @@ export const ForestEnvironment = () => {
     <group>
       <Sky
         distance={45000}
-        sunPosition={[-6, 8, -12]}
-        inclination={0.64}
-        azimuth={0.22}
-        mieCoefficient={0.015}
-        mieDirectionalG={0.82}
-        rayleigh={2.6}
-        turbidity={9}
+        sunPosition={[-18, -6, -24]}
+        inclination={0.95}
+        azimuth={0.34}
+        mieCoefficient={0.001}
+        mieDirectionalG={0.97}
+        rayleigh={0.3}
+        turbidity={1.8}
+        exposure={0.25}
       />
-      <Stars radius={180} depth={50} count={2500} factor={4} saturation={0.7} fade speed={0.2} />
-      <color attach="background" args={['#34133f']} />
-      <fog attach="fog" args={['#402047', 18, 70]} />
-      <hemisphereLight intensity={0.6} skyColor="#ffba9a" groundColor="#1b1a2e" />
+      <Stars radius={240} depth={80} count={3200} factor={3} saturation={0.6} fade speed={0.18} />
+      <color attach="background" args={['#07102c']} />
+      <fog attach="fog" args={['#0d1b3a', 18, 70]} />
+      <hemisphereLight intensity={0.4} skyColor="#1a2c63" groundColor="#0d141f" />
       <directionalLight
-        position={[12, 9, 8]}
-        intensity={0.95}
-        color="#ffb26f"
-
+        position={[14, 12, -6]}
+        intensity={0.45}
+        color="#a7b5ff"
         castShadow
         shadow-mapSize={[2048, 2048]}
         shadow-camera-far={70}
       />
+      <pointLight position={[-24, 18, -32]} intensity={0.55} color="#f6f2d9" distance={80} decay={2.5} />
 
-      <ambientLight intensity={0.35} color="#a45ce8" />
+      <ambientLight intensity={0.25} color="#6475c7" />
+
+      <mesh position={[-24, 18, -32]} castShadow>
+        <sphereGeometry args={[2.8, 48, 48]} />
+        <meshStandardMaterial
+          color="#f7f5e9"
+          emissive="#f0e7c0"
+          emissiveIntensity={0.9}
+          roughness={0.4}
+          metalness={0}
+        />
+      </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[160, 160, 1, 1]} />
         <meshStandardMaterial color="#0f1b1a" roughness={0.95} metalness={0.03} />
