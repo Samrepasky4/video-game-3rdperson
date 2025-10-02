@@ -8,6 +8,8 @@ import { ForestEnvironment } from './components/ForestEnvironment';
 import { Fireflies } from './components/Fireflies';
 import type { CoinDescriptor } from './types';
 
+
+
 const mulberry32 = (seed: number) => {
   return () => {
     let t = seed += 0x6d2b79f5;
@@ -50,7 +52,6 @@ const App = () => {
   const [started, setStarted] = useState(false);
   const [collected, setCollected] = useState<Set<number>>(() => new Set());
   const playerGroupRef = useRef<Group | null>(null);
-
   const handleCollect = useCallback((id: number) => {
     setCollected((previous) => {
       if (previous.has(id)) return previous;
