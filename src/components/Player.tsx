@@ -37,6 +37,7 @@ export const Player = forwardRef<Group, PlayerProps>(({ coins, collected, onColl
   const bobOffset = useRef(Math.random() * Math.PI * 2);
 
   useImperativeHandle(ref, () => groupRef.current as Group, []);
+
   useFrame(({ camera }, delta) => {
     const player = groupRef.current;
     if (!player) return;
