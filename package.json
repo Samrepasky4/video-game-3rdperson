@@ -9,12 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@react-three/drei": "^9.103.0",
-    "@react-three/fiber": "^9.0.0",
+    "@react-three/drei": "^9",
+    "@react-three/fiber": "^8",
     "@react-three/rapier": "^1.5.0",
     "leva": "^0.9.35",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "react-reconciler": "^0.29.0",
     "three": "^0.161.0"
   },
@@ -29,5 +29,8 @@
     "eslint-plugin-react-refresh": "^0.4.5",
     "typescript": "^5.2.2",
     "vite": "^5.0.0"
+  },
+  "overrides": {
+    "@react-three/fiber": "^8"
   }
 }
