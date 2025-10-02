@@ -1,4 +1,3 @@
-
 import { Suspense, useCallback, useMemo, useRef, useState } from 'react';
 import type { Group } from 'three';
 import { Canvas } from '@react-three/fiber';
@@ -8,6 +7,7 @@ import { Player } from './components/Player';
 import { ForestEnvironment } from './components/ForestEnvironment';
 import { Fireflies } from './components/Fireflies';
 import type { CoinDescriptor } from './types';
+
 
 
 const mulberry32 = (seed: number) => {
@@ -65,9 +65,10 @@ const App = () => {
     return (
       <div className="landing">
         <div className="landing__panel">
-          <h1>Fairy Forest </h1>
+          <h1>Fairy Forest Drift</h1>
           <p>
-           You're a Fairy :-P
+            Drift through a twilight grove as a luminous fairy, gather resonant coins, and let your ambient
+            soundtrack carry the journey.
           </p>
           <button type="button" onClick={() => setStarted(true)}>
             Play
