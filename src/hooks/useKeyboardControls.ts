@@ -27,6 +27,7 @@ const INITIAL_STATE: ControlState = Object.freeze({
 export const useKeyboardControls = () => {
   const stateRef = useRef<ControlState>({ ...INITIAL_STATE });
   const activeControls = useRef(new Set<keyof ControlState>());
+
   const keyToControl = useMemo(() => {
     const map = new Map<string, keyof ControlState>();
     (Object.keys(CONTROL_PRESETS) as (keyof ControlState)[]).forEach((control) => {
@@ -64,6 +65,7 @@ export const useKeyboardControls = () => {
     const handleKeyUp = (event: KeyboardEvent) => {
       const control = keyToControl.get(event.code);
       if (!control) return;
+
       event.preventDefault();
       setControlState(control, false);
     };

@@ -81,4 +81,4 @@ Feel free to replace these with higher fidelity assets; just update the referenc
 
 
   The updated reconciler runtime restores compatibility between React 18 and the React Three Fiber renderer that drives the scene. If you see `ERESOLVE unable to resolve dependency tree`, clear any old lockfile and reinstall so that `@react-three/fiber@8.15.12` and `@react-three/drei@9.86.7` are pulled in alongside React 18.
-  
+

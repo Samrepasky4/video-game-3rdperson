@@ -381,7 +381,6 @@ export const ForestEnvironment = ({ playerRef }: ForestEnvironmentProps) => {
 
       <instancedMesh ref={grassRef} args={[undefined, undefined, layout.grass.length]} receiveShadow>
         <coneGeometry args={[0.5, 1.4, 6]} />
-
         <meshStandardMaterial color="#1f6a3b" emissive="#0f3c24" emissiveIntensity={0.18} roughness={0.9} />
       </instancedMesh>
     </group>
