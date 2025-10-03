@@ -1,3 +1,4 @@
+
 import { forwardRef, useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import {
@@ -82,6 +83,7 @@ const createForestLayout = (): ForestLayout => {
     const z = rand() * 220 - 110;
 
     if (Math.abs(x) < 5 && z > -10 && z < 24) {
+
       continue;
     }
 
@@ -259,6 +261,7 @@ export const ForestEnvironment = ({ playerRef }: ForestEnvironmentProps) => {
     grassRef.current.instanceMatrix.needsUpdate = true;
   }, [layout.grass]);
 
+
   useFrame(({ camera }) => {
     const player = playerRef.current;
     if (!player) return;
@@ -386,3 +389,4 @@ export const ForestEnvironment = ({ playerRef }: ForestEnvironmentProps) => {
 
 useGLTF.preload('/assets/tree.gltf');
 useGLTF.preload('/assets/shrub.gltf');
+

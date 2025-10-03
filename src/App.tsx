@@ -8,6 +8,7 @@ import { ForestEnvironment } from './components/ForestEnvironment';
 import { Fireflies } from './components/Fireflies';
 import type { CoinDescriptor } from './types';
 
+
 const mulberry32 = (seed: number) => {
   return () => {
     let t = seed += 0x6d2b79f5;
@@ -80,7 +81,9 @@ const App = () => {
   return (
     <>
       <div className="ui-overlay">
+
         <h1>Fairy Forest Drift</h1>
+
         <div className="ui-overlay__counter" aria-live="polite">
           <span className="ui-overlay__counter-icon" aria-hidden="true">
             <svg viewBox="0 0 32 32" role="presentation" focusable="false">
@@ -104,7 +107,9 @@ const App = () => {
             <span className="ui-overlay__counter-total">/{coins.length}</span>
           </span>
         </div>
+
         <p>Glide with WASD or the arrow keys to gather shimmering dusk coins.</p>
+
       </div>
       <Canvas shadows camera={{ position: [0, 3.5, -7], fov: 50 }} dpr={[1, 2]}>
         <Suspense fallback={null}>
