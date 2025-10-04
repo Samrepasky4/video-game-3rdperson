@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-Open the printed local URL to explore the nebula grove. Use `W`, `A`, `S`, `D` or the arrow keys to guide the fairy around the cosmic clearing and scoop up every shimmering orb.
+Open the printed local URL to explore the nebula grove. Tap **Play**, watch the hungry fairy dream about orbs, then use `W`, `A`, `S`, `D`, the arrow keys, or the on-screen touch controls to guide the fairy around the cosmic clearing and scoop up every shimmering orb.
 
 ## Testing the project
 
@@ -48,7 +48,8 @@ The prototype does not ship with automated unit tests yet, so testing is a manua
 │   │   ├── Coins.tsx / Coin.tsx# Collectible orb visuals
 │   │   ├── SpaceEnvironment.tsx
 │   │   │                        # Lighting, stars, asteroid field, and comet choreography
-│   │   └── Fireflies.tsx       # Floating stardust particles
+│   │   ├── Fireflies.tsx       # Floating stardust particles
+│   │   └── TouchControls.tsx   # Pointer-friendly overlay for mobile play
 │   ├── hooks
 │   │   └── useKeyboardControls.ts
 │   ├── styles

@@ -1,6 +1,6 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Group } from 'three';
+import { Group, Vector3 } from 'three';
 import { Stars } from '@react-three/drei';
 import type { MutableRefObject } from 'react';
 
@@ -14,11 +14,18 @@ const mulberry32 = (seed: number) => {
 };
 
 type AsteroidDescriptor = {
-  radius: number;
-  offset: number;
-  speed: number;
-  tilt: number;
+  position: Vector3;
+  velocity: Vector3;
+  spin: Vector3;
   scale: number;
+};
+
+const randomDirection = (rand: () => number) => {
+  const direction = new Vector3(rand() - 0.5, rand() - 0.5, rand() - 0.5);
+  if (direction.lengthSq() < 0.0001) {
+    direction.set(1, 0, 0);
+  }
+  return direction.normalize();
 };
 
 const createAsteroidDescriptors = (): AsteroidDescriptor[] => {
@@ -26,13 +33,11 @@ const createAsteroidDescriptors = (): AsteroidDescriptor[] => {
   const asteroids: AsteroidDescriptor[] = [];
   const asteroidCount = 26;
   for (let index = 0; index < asteroidCount; index += 1) {
-    asteroids.push({
-      radius: 24 + rand() * 52,
-      offset: rand() * Math.PI * 2,
-      speed: 0.08 + rand() * 0.18,
-      tilt: rand() * Math.PI * 0.7,
-      scale: 0.6 + rand() * 2.2,
-    });
+    const position = new Vector3((rand() - 0.5) * 80, (rand() - 0.5) * 60, (rand() - 0.5) * 80);
+    const velocity = randomDirection(rand).multiplyScalar(2 + rand() * 4);
+    const spin = randomDirection(rand).multiplyScalar(0.4 + rand() * 1.2);
+    const scale = 0.6 + rand() * 2.2;
+    asteroids.push({ position, velocity, spin, scale });
   }
 
   return asteroids;
@@ -57,17 +62,26 @@ type AsteroidProps = {
 
 const Asteroid = ({ descriptor }: AsteroidProps) => {
   const groupRef = useRef<Group>(null);
+  const boundary = 72;
+  const normal = useRef(new Vector3());
 
-  useFrame(({ clock }) => {
+  useFrame((_, delta) => {
     const group = groupRef.current;
     if (!group) return;
-    const { radius, offset, speed, tilt, scale } = descriptor;
-    const t = clock.elapsedTime * speed + offset;
-    const x = Math.cos(t) * radius;
-    const z = Math.sin(t) * radius;
-    const y = 8 + Math.sin(t * 0.7 + offset) * 6 + Math.cos(t * 1.3) * 2;
-    group.position.set(x, y, z);
-    group.rotation.set(Math.sin(t * 0.6) * 0.8 + tilt, t * 0.4, Math.cos(t * 0.5) * 0.6);
+    const { position, velocity, spin, scale } = descriptor;
+    position.addScaledVector(velocity, delta);
+
+    if (position.length() > boundary) {
+      const normalDir = normal.current.copy(position).normalize();
+      const dot = velocity.dot(normalDir);
+      velocity.addScaledVector(normalDir, -2 * dot);
+      position.setLength(boundary - 0.5);
+    }
+
+    group.position.copy(position);
+    group.rotation.x += spin.x * delta;
+    group.rotation.y += spin.y * delta;
+    group.rotation.z += spin.z * delta;
     group.scale.setScalar(scale);
   });
 

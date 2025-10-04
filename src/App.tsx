@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useMemo, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Group } from 'three';
 import { Canvas } from '@react-three/fiber';
 import { Loader } from '@react-three/drei';
@@ -6,7 +6,9 @@ import { Coins } from './components/Coins';
 import { Player } from './components/Player';
 import { SpaceEnvironment } from './components/SpaceEnvironment';
 import { Fireflies } from './components/Fireflies';
+import { TouchControls } from './components/TouchControls';
 import type { CoinDescriptor } from './types';
+import { useKeyboardControls } from './hooks/useKeyboardControls';
 
 const mulberry32 = (seed: number) => {
   return () => {
@@ -62,8 +64,10 @@ const generateCoins = (): CoinDescriptor[] => {
 const App = () => {
   const coins = useMemo(() => generateCoins(), []);
   const [started, setStarted] = useState(false);
+  const [introComplete, setIntroComplete] = useState(false);
   const [collected, setCollected] = useState<Set<number>>(() => new Set());
   const playerGroupRef = useRef<Group | null>(null);
+  const controls = useKeyboardControls();
 
   const handleCollect = useCallback((id: number) => {
     setCollected((previous) => {
@@ -74,6 +78,24 @@ const App = () => {
     });
   }, []);
 
+  useEffect(() => {
+    if (!introComplete) {
+      controls.reset();
+    }
+  }, [controls, introComplete]);
+
+  const handlePlay = useCallback(() => {
+    controls.reset();
+    setCollected(() => new Set());
+    setStarted(true);
+    setIntroComplete(false);
+  }, [controls]);
+
+  const handleBegin = useCallback(() => {
+    controls.reset();
+    setIntroComplete(true);
+  }, [controls]);
+
   if (!started) {
     return (
       <div className="landing">
@@ -83,7 +105,7 @@ const App = () => {
             Soar with your fairy through an alien nebula garden, gather luminous orbs, and glide alongside
             drifting asteroids while your ambient soundtrack shimmers.
           </p>
-          <button type="button" onClick={() => setStarted(true)}>
+          <button type="button" onClick={handlePlay}>
             Play
           </button>
         </div>
@@ -114,16 +136,46 @@ const App = () => {
             <span className="ui-overlay__counter-total">/{coins.length}</span>
           </span>
         </div>
-        <p>Glide with WASD or the arrow keys to gather drifting starlit orbs among comets and asteroids.</p>
+        <p>
+          Glide with WASD, the arrow keys, or the touch controls to gather drifting starlit orbs among comets
+          and asteroids.
+        </p>
       </div>
       <Canvas shadows camera={{ position: [0, 3.5, -7], fov: 50 }} dpr={[1, 2]}>
         <Suspense fallback={null}>
           <SpaceEnvironment playerRef={playerGroupRef} />
           <Fireflies count={120} />
-          <Player ref={playerGroupRef} coins={coins} collected={collected} onCollect={handleCollect} />
+          <Player
+            ref={playerGroupRef}
+            coins={coins}
+            collected={collected}
+            onCollect={handleCollect}
+            controlsEnabled={introComplete}
+          />
           <Coins coins={coins} collected={collected} />
         </Suspense>
       </Canvas>
+      <TouchControls controls={controls} disabled={!introComplete} />
+      {!introComplete && (
+        <div className="intro-overlay" role="dialog" aria-modal="true">
+          <div className="intro-overlay__content">
+            <div className="intro-overlay__character">
+              <div className="intro-overlay__avatar" aria-hidden="true" />
+              <div className="intro-overlay__speech" aria-live="polite">
+                <p>Need more glow! Have you seen those orbs?</p>
+                <div className="intro-overlay__orbs" aria-hidden="true">
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <span key={index} className="intro-overlay__orb" />
+                  ))}
+                </div>
+              </div>
+            </div>
+            <button type="button" onClick={handleBegin} className="intro-overlay__button">
+              Let&apos;s snack on starlight
+            </button>
+          </div>
+        </div>
+      )}
       <Loader />
     </>
   );
