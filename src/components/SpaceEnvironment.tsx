@@ -172,14 +172,6 @@ export const SpaceEnvironment = ({ playerRef: _playerRef }: SpaceEnvironmentProp
     <group>
       <color attach="background" args={['#000000']} />
       <Stars radius={620} depth={220} count={8200} factor={4.6} saturation={0.6} fade speed={0.2} />
-       <Stars
-        radius={50} // Radius of the sphere containing the stars
-        depth={30} // Depth of the starfield
-        count={10000} // Number of stars
-        factor={4} // Size factor for the stars
-        saturation={0} // Saturation of the star color
-        fade // Whether stars fade in/out
-      />
 
       <ambientLight intensity={0.2} color="#6fa6ff" />
       <directionalLight position={[22, 30, -16]} intensity={0.45} color="#9cc6ff" castShadow />

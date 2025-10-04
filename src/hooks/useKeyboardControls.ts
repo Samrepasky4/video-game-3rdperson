@@ -17,8 +17,8 @@ export type ControlsApi = {
 const CONTROL_PRESETS: Record<keyof ControlState, string[]> = {
   forward: ['KeyW', 'ArrowUp'],
   backward: ['KeyS', 'ArrowDown'],
-  left: ['KeyA', 'ArrowRight'],
-  right: ['KeyD', 'ArrowLeft'],
+  left: ['KeyA', 'ArrowLeft'],
+  right: ['KeyD', 'ArrowRight'],
   jump: ['Space'],
 };
 

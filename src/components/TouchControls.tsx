@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import type { PointerEvent as ReactPointerEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react';
 import type { ControlsApi } from '../hooks/useKeyboardControls';
 
 type TouchControlsProps = {
@@ -7,90 +7,119 @@ type TouchControlsProps = {
   disabled?: boolean;
 };
 
-type DirectionControl = 'forward' | 'backward' | 'left' | 'right';
-
-const CONTROL_SYMBOLS: Record<DirectionControl, string> = {
-  forward: '▲',
-  backward: '▼',
-  left: '⟲',
-  right: '⟳',
-};
-
 export const TouchControls = ({ controls, disabled = false }: TouchControlsProps) => {
+  const joystickRef = useRef<HTMLDivElement>(null);
+  const pointerIdRef = useRef<number | null>(null);
+  const boundsRef = useRef<DOMRect | null>(null);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+
+  const threshold = useMemo(() => 0.25, []);
+
+  const resetJoystick = useCallback(() => {
+    pointerIdRef.current = null;
+    boundsRef.current = null;
+    setOffset({ x: 0, y: 0 });
+    controls.reset();
+  }, [controls]);
+
   useEffect(() => {
     if (disabled) {
-      controls.reset();
+      resetJoystick();
     }
-  }, [controls, disabled]);
+  }, [disabled, resetJoystick]);
 
-  const handlePress = (control: DirectionControl, nextValue: boolean) => {
+  const applyVector = useCallback(
+    (x: number, y: number) => {
+      controls.setControlState('forward', -y > threshold);
+      controls.setControlState('backward', y > threshold);
+      controls.setControlState('left', x < -threshold);
+      controls.setControlState('right', x > threshold);
+    },
+    [controls, threshold],
+  );
+
+  const handlePointerMove = (clientX: number, clientY: number) => {
+    const base = joystickRef.current;
+    if (!base) return;
+
+    const rect = boundsRef.current ?? base.getBoundingClientRect();
+    boundsRef.current = rect;
+
+    const radius = rect.width / 2;
+    if (radius === 0) return;
+
+    const centerX = rect.left + radius;
+    const centerY = rect.top + radius;
+
+    const deltaX = clientX - centerX;
+    const deltaY = clientY - centerY;
+    const distance = Math.min(Math.hypot(deltaX, deltaY), radius);
+
+    const angle = Math.atan2(deltaY, deltaX);
+    const clampedX = Math.cos(angle) * distance;
+    const clampedY = Math.sin(angle) * distance;
+
+    const normalizedX = clampedX / radius;
+    const normalizedY = clampedY / radius;
+
+    setOffset({ x: clampedX, y: clampedY });
+    applyVector(normalizedX, normalizedY);
+  };
+
+  const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (disabled) {
-      controls.setControlState(control, false);
+      resetJoystick();
       return;
     }
-    controls.setControlState(control, nextValue);
+
+    const base = joystickRef.current;
+    if (!base) return;
+
+    pointerIdRef.current = event.pointerId;
+    boundsRef.current = base.getBoundingClientRect();
+    base.setPointerCapture(event.pointerId);
+    event.preventDefault();
+    handlePointerMove(event.clientX, event.clientY);
   };
 
-  const createPressHandler = (control: DirectionControl, nextValue: boolean) => {
-    return (event: ReactPointerEvent<HTMLButtonElement>) => {
-      event.preventDefault();
-      handlePress(control, nextValue);
-    };
+  const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (pointerIdRef.current !== event.pointerId) return;
+    event.preventDefault();
+    handlePointerMove(event.clientX, event.clientY);
   };
 
-  const handlePointerUp = (control: DirectionControl) => {
-    return () => {
-      controls.setControlState(control, false);
-    };
+  const onPointerEnd = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (pointerIdRef.current !== event.pointerId) return;
+    const base = joystickRef.current;
+    if (base) {
+      base.releasePointerCapture(event.pointerId);
+    }
+    event.preventDefault();
+    resetJoystick();
   };
+
+  const knobStyle = useMemo(
+    () =>
+      ({
+        '--offset-x': `${offset.x}px`,
+        '--offset-y': `${offset.y}px`,
+      }) as CSSProperties & { '--offset-x': string; '--offset-y': string },
+    [offset],
+  );
 
   return (
     <div className="touch-controls" aria-hidden="true">
-      <div className="touch-controls__inner">
-        <div className="touch-controls__cluster">
-          <button
-            type="button"
-            className="touch-controls__button touch-controls__button--wide"
-            onPointerDown={createPressHandler('forward', true)}
-            onPointerUp={handlePointerUp('forward')}
-            onPointerLeave={handlePointerUp('forward')}
-            onPointerCancel={handlePointerUp('forward')}
-          >
-            <span>{CONTROL_SYMBOLS.forward}</span>
-          </button>
-          <div className="touch-controls__row">
-            <button
-              type="button"
-              className="touch-controls__button"
-              onPointerDown={createPressHandler('left', true)}
-              onPointerUp={handlePointerUp('left')}
-              onPointerLeave={handlePointerUp('left')}
-              onPointerCancel={handlePointerUp('left')}
-            >
-              <span>{CONTROL_SYMBOLS.left}</span>
-            </button>
-            <button
-              type="button"
-              className="touch-controls__button"
-              onPointerDown={createPressHandler('right', true)}
-              onPointerUp={handlePointerUp('right')}
-              onPointerLeave={handlePointerUp('right')}
-              onPointerCancel={handlePointerUp('right')}
-            >
-              <span>{CONTROL_SYMBOLS.right}</span>
-            </button>
-          </div>
-          <button
-            type="button"
-            className="touch-controls__button touch-controls__button--wide"
-            onPointerDown={createPressHandler('backward', true)}
-            onPointerUp={handlePointerUp('backward')}
-            onPointerLeave={handlePointerUp('backward')}
-            onPointerCancel={handlePointerUp('backward')}
-          >
-            <span>{CONTROL_SYMBOLS.backward}</span>
-          </button>
-        </div>
+      <div
+        ref={joystickRef}
+        className="touch-controls__joystick"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerEnd}
+        onPointerCancel={onPointerEnd}
+        onPointerLeave={onPointerEnd}
+      >
+        <div className="touch-controls__ring" />
+        <div className="touch-controls__knob" style={knobStyle} />
       </div>
     </div>
   );

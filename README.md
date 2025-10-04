@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-Open the printed local URL to explore the nebula grove. Tap **Play**, watch the hungry fairy dream about orbs, then use `W`, `A`, `S`, `D`, the arrow keys, or the on-screen touch controls to guide the fairy around the cosmic clearing and scoop up every shimmering orb.
+Open the printed local URL to explore the nebula grove. Tap **Play**, watch the hungry fairy dream about orbs, then use `W`, `A`, `S`, `D`, the arrow keys, or drag the transparent on-screen joystick to guide the fairy around the cosmic clearing and scoop up every shimmering orb.
 
 ## Testing the project
 
