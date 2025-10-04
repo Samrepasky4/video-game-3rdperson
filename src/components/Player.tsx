@@ -29,6 +29,7 @@ export const Player = forwardRef<Group, PlayerProps>(({ coins, collected, onColl
   const velocity = useRef(new Vector3());
   const desiredVelocity = useRef(new Vector3());
   const heading = useRef(0);
+  const visualProgress = useRef(0);
   const helpers = useMemo(
     () => ({
       direction: new Vector3(),
@@ -114,7 +115,12 @@ export const Player = forwardRef<Group, PlayerProps>(({ coins, collected, onColl
     camera.lookAt(player.position.x, player.position.y + 0.6, player.position.z);
 
     const progress = Math.min(1, collected.size / Math.max(1, coins.length));
-    const easedProgress = 1 - (1 - progress) * (1 - progress);
+    const smoothing = 1 - Math.exp(-3.2 * delta);
+    visualProgress.current = MathUtils.lerp(visualProgress.current, progress, smoothing);
+    if (Math.abs(progress - visualProgress.current) < 0.0001) {
+      visualProgress.current = progress;
+    }
+    const easedProgress = 1 - (1 - visualProgress.current) * (1 - visualProgress.current);
     const intensityLerp = 1 - Math.exp(-6 * delta);
 
     if (bodyMaterialRef.current) {

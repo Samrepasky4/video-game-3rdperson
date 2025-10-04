@@ -1,6 +1,6 @@
-# Fairy Forest Drift
+# Cosmic Grove Run
 
-A third-person fairy exploration prototype built with React, TypeScript, Vite, and React Three Fiber. Glide through a twilight forest, collect luminous dusk coins, and enjoy an ambient modular-synth-inspired atmosphere.
+A third-person fairy exploration prototype built with React, TypeScript, Vite, and React Three Fiber. Glide through an alien nebula garden, collect luminous starlit orbs, and enjoy an ambient modular-synth-inspired atmosphere.
 
 ## Getting started
 
@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-Open the printed local URL to explore the forest. Use `W`, `A`, `S`, `D` or the arrow keys to guide the fairy around the glade and scoop up every shimmering coin.
+Open the printed local URL to explore the nebula grove. Use `W`, `A`, `S`, `D` or the arrow keys to guide the fairy around the cosmic clearing and scoop up every shimmering orb.
 
 ## Testing the project
 
@@ -29,7 +29,7 @@ The prototype does not ship with automated unit tests yet, so testing is a manua
    npm run preview
    ```
 
-   Open the logged preview URL in your browser, confirm the scene loads, collect a few coins, and verify the counter updates. This is the best way to check everything end-to-end until automated coverage is added.
+   Open the logged preview URL in your browser, confirm the scene loads, collect a few orbs, and verify the counter updates. This is the best way to check everything end-to-end until automated coverage is added.
 
 ## Scripts
 
@@ -45,10 +45,10 @@ The prototype does not ship with automated unit tests yet, so testing is a manua
 │   ├── main.tsx                # React entry point
 │   ├── components
 │   │   ├── Player.tsx          # Fairy controller and third-person camera follow
-│   │   ├── Coins.tsx / Coin.tsx# Collectible coin visuals
-│   │   ├── ForestEnvironment.tsx
-│   │   │                        # Lighting, trees, and ground composition
-│   │   └── Fireflies.tsx       # Floating ambient particles
+│   │   ├── Coins.tsx / Coin.tsx# Collectible orb visuals
+│   │   ├── SpaceEnvironment.tsx
+│   │   │                        # Lighting, stars, plants, asteroids, and ground composition
+│   │   └── Fireflies.tsx       # Floating stardust particles
 │   ├── hooks
 │   │   └── useKeyboardControls.ts
 │   ├── styles
@@ -57,18 +57,13 @@ The prototype does not ship with automated unit tests yet, so testing is a manua
 └── vite.config.ts
 ```
 
-
-The scene blends imported glTF foliage assets with instanced shrubs/grass, a smooth-follow camera, and simple collision checks for coin collection to keep the prototype lightweight and easy to extend.
+The scene blends procedural alien flora, orbiting asteroids, a smooth-follow camera, and simple collision checks for orb collection to keep the prototype lightweight and easy to extend.
 
 ## Art assets
 
-- **Tree model** – `public/assets/tree.gltf` is a handcrafted low-poly tree exported directly into the repository so no external downloads are required.
-- **Shrub model** – `public/assets/shrub.gltf` supplies a stylised hemisphere shrub used for undergrowth instancing.
-- **Procedural ground texture** – the ground material is generated at runtime inside `ForestEnvironment.tsx` using a canvas-based
-  gradient and noise pass so no external texture downloads are required.
+- **Procedural flora and ground** – all alien plants, sprouts, and the cosmic clearing are generated inside `SpaceEnvironment.tsx` using built-in Three.js primitives and gradients, so no external downloads are required.
 
-Feel free to replace these with higher fidelity assets; just update the references under `ForestEnvironment.tsx` to point to the new files.
-
+Feel free to replace these with higher fidelity assets; just update the references under `SpaceEnvironment.tsx` to point to the new files.
 
 ## Troubleshooting
 
@@ -79,6 +74,4 @@ Feel free to replace these with higher fidelity assets; just update the referenc
   npm install
   ```
 
-
   The updated reconciler runtime restores compatibility between React 18 and the React Three Fiber renderer that drives the scene. If you see `ERESOLVE unable to resolve dependency tree`, clear any old lockfile and reinstall so that `@react-three/fiber@8.15.12` and `@react-three/drei@9.86.7` are pulled in alongside React 18.
-
