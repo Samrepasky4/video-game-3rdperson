@@ -78,10 +78,9 @@ const App = () => {
     return (
       <div className="landing">
         <div className="landing__panel">
-          <h1>Cosmic Grove Run</h1>
+          <h1>hungry for bubbles</h1>
           <p>
-            Soar with your fairy through an alien nebula garden, gather luminous orbs, and glide alongside
-            drifting asteroids while your ambient soundtrack shimmers.
+            
           </p>
           <button type="button" onClick={() => setStarted(true)}>
             Play
@@ -93,8 +92,8 @@ const App = () => {
 
   return (
     <>
-      <div className="ui-overlay">
-        <h1>Cosmic Grove Run</h1>
+      <div className="">
+      
         <div className="ui-overlay__counter" aria-live="polite">
           <span className="ui-overlay__counter-icon" aria-hidden="true">
             <svg viewBox="0 0 32 32" role="presentation" focusable="false">
@@ -114,7 +113,7 @@ const App = () => {
             <span className="ui-overlay__counter-total">/{coins.length}</span>
           </span>
         </div>
-        <p>Glide with WASD or the arrow keys to gather drifting starlit orbs among comets and asteroids.</p>
+       
       </div>
       <Canvas shadows camera={{ position: [0, 3.5, -7], fov: 50 }} dpr={[1, 2]}>
         <Suspense fallback={null}>
