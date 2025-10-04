@@ -119,7 +119,7 @@ const App = () => {
       <Canvas shadows camera={{ position: [0, 3.5, -7], fov: 50 }} dpr={[1, 2]}>
         <Suspense fallback={null}>
           <SpaceEnvironment playerRef={playerGroupRef} />
-          <Fireflies count={80} />
+          <Fireflies count={120} />
           <Player ref={playerGroupRef} coins={coins} collected={collected} onCollect={handleCollect} />
           <Coins coins={coins} collected={collected} />
         </Suspense>

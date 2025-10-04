@@ -47,7 +47,7 @@ The prototype does not ship with automated unit tests yet, so testing is a manua
 │   │   ├── Player.tsx          # Fairy controller and third-person camera follow
 │   │   ├── Coins.tsx / Coin.tsx# Collectible orb visuals
 │   │   ├── SpaceEnvironment.tsx
-│   │   │                        # Lighting, stars, plants, asteroids, and ground composition
+│   │   │                        # Lighting, stars, asteroid field, and comet choreography
 │   │   └── Fireflies.tsx       # Floating stardust particles
 │   ├── hooks
 │   │   └── useKeyboardControls.ts
@@ -57,11 +57,11 @@ The prototype does not ship with automated unit tests yet, so testing is a manua
 └── vite.config.ts
 ```
 
-The scene blends procedural alien flora, orbiting asteroids, a smooth-follow camera, and simple collision checks for orb collection to keep the prototype lightweight and easy to extend.
+The scene blends a drifting asteroid belt, roaming comets, a smooth-follow camera, and simple collision checks for orb collection to keep the prototype lightweight and easy to extend.
 
 ## Art assets
 
-- **Procedural flora and ground** – all alien plants, sprouts, and the cosmic clearing are generated inside `SpaceEnvironment.tsx` using built-in Three.js primitives and gradients, so no external downloads are required.
+- **Procedural space dressing** – the asteroid choreography, comet paths, and starfield depth cues are generated inside `SpaceEnvironment.tsx` using built-in Three.js primitives and gradients, so no external downloads are required.
 
 Feel free to replace these with higher fidelity assets; just update the references under `SpaceEnvironment.tsx` to point to the new files.
 
